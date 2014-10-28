@@ -1,0 +1,14 @@
+{
+    "name": "productsupcom/product-api-client",
+    "authors": [
+        {
+            "name": "Productsup GmbH",
+            "email": "technik@products-up.de"
+        }
+    ],
+    "autoload": {
+        "psr-0" : {
+            "Productsup": "lib/"
+        }
+    }
+}
