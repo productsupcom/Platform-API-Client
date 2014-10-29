@@ -28,7 +28,7 @@ $Reference->setKey($Reference::REFERENCE_SITE);
 $Reference->setValue(1234); // Site ID
 
 /**
- * In case you have a metadata tag as reference 
+ * In case you want to use your own reference
  **/
 $Reference->setKey('merchant_id'); // A site tag 
 $Reference->setValue(1234); // Value of the tag
