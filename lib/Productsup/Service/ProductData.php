@@ -8,11 +8,12 @@ use Productsup\IO\Curl as Curl;
 
 class ProductData extends Service
 {
-    const URL_REFERENCEID = '%s://%s/%s/%s/refid/%s/%s';
-    const URL_SITEID = '%s://%s/%s/%s/site/%s/%s';
+    const URL_PRODUCTS = '%s://%s/%s/%s/%s/%s/%s';
 
     private $_insert = array();
     private $_delete = array();
+    private $_batchId;
+    private $_submitLog = array();
 
     /**
      * function __construct()
@@ -24,8 +25,21 @@ class ProductData extends Service
         parent::__construct($Client);
 
         $this->version = 'v1';
-        $this->serviceName = 'platform';
-        $this->apiEndpoint = 'products';
+        $this->serviceName = 'products';
+        $this->createBatchId();
+    }
+
+    /**
+     * funcrtion createBatchId
+     * 
+     * creates a new batch id for multi-request submits
+     * @return string Hash
+     */
+    private function createBatchId()
+    {
+        $this->_insert = array();
+        $this->_delete = array();
+        $this->_batchId = md5(microtime().uniqid());
     }
 
     /**
@@ -38,6 +52,7 @@ class ProductData extends Service
     public function insert(array $product)
     {
         $this->_insert[] = $product;
+        $this->checkSubmit();
     }
 
     /**
@@ -50,27 +65,66 @@ class ProductData extends Service
     public function delete(array $product)
     {
         $this->_delete[] = $product;
+        $this->checkSubmit();
+    }
+
+    /**
+     * function checkSubmit()
+     * 
+     * Checks if the post limit has been reached and will submit a chunk
+     */
+    private function checkSubmit()
+    {
+        if(count($this->_insert) + count($this->_delete) > $this->getPostLimit()) {
+            $this->submit();
+        }
     }
 
     /**
      * function submitInsert()
      * 
      * submits products to the product-data api
-     * 
-     * @return array Reponse Status
      */
-    public function submit()
+    private function submit()
     {
+        if($this->getReference() === null) {
+            throw new \Exception('Missing Reference');
+        }
+
         $response = array();
         if(count($this->_insert) > 0) {
-            $response['insert'] = $this->submitInsert();
+            $this->_submitLog[] = $this->submitInsert();
         }
 
         if(count($this->_delete) > 0) {
-            $response['delete'] = $this->submitDelete();
+            $this->_submitLog[] = $this->submitDelete();
+        }
+    }
+
+    /**
+     * function commit()
+     * 
+     * after 1-n submits, this will commit the final chunk of products and
+     * resets the class so that a new products will be a new batch.
+     * 
+     * @return array Submit Log for Debugging
+     */
+    public function commit()
+    {
+        if (count($this->_insert) > 0 || count($this->_delete) > 0) {
+            $this->submit();
         }
 
-        return $response;
+        $this->createBatchId();
+
+        return $this->getSubmitLog();
+    }
+
+    private function getSubmitLog()
+    {
+        $log = $this->_submitLog;
+        $this->_submitLog = array();
+        return $log;
     }
 
     /**
@@ -84,15 +138,19 @@ class ProductData extends Service
     {
         $DeleteRequest = new Request($this->getClient());
         $DeleteRequest->method = Request::METHOD_DELETE;
-        $DeleteRequest->postBody = $this->_delete;
+        $DeleteRequest->postBody = array(
+            'batchid' => $this->_batchId, 
+            'products' => $this->_delete
+        );
         $DeleteRequest->url = sprintf(
-            $this->referenceId ? self::URL_REFERENCEID : self::URL_SITEID,
+            self::URL_PRODUCTS,
             $this->scheme,
             $this->host,
-            $this->serviceName,
+            $this->api,
             $this->version,
-            $this->referenceId ?: $this->siteId,
-            $this->apiEndpoint
+            $this->serviceName,
+            urlencode($this->getReference()->getKey()),
+            urlencode($this->getReference()->getValue())
         );
 
         $Curl = new Curl();
@@ -116,15 +174,19 @@ class ProductData extends Service
     {
         $InsertRequest = new Request($this->getClient());
         $InsertRequest->method = Request::METHOD_POST;
-        $InsertRequest->postBody = $this->_insert;
+        $InsertRequest->postBody = array(
+            'batchid' => $this->_batchId, 
+            'products' => $this->_insert
+        );
         $InsertRequest->url = sprintf(
-            $this->referenceId ? self::URL_REFERENCEID : self::URL_SITEID,
+            self::URL_PRODUCTS,
             $this->scheme,
             $this->host,
-            $this->serviceName,
+            $this->api,
             $this->version,
-            $this->referenceId ?: $this->siteId,
-            $this->apiEndpoint
+            $this->serviceName,
+            urlencode($this->getReference()->getKey()),
+            urlencode($this->getReference()->getValue())
         );
 
         $Curl = new Curl();

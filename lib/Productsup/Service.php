@@ -2,6 +2,7 @@
 
 namespace Productsup;
 use Productsup\Client as Client;
+use Productsup\Platform\Site\Reference as Reference;
 
 abstract class Service
 {
@@ -20,13 +21,13 @@ abstract class Service
     /** var $serviceName string Service Name */
     public $api;
 
-    /** var $referenceId string Reference Id */
-    public $referenceId;
-
     /** var $site string Platform Site Id */
     public $siteId;
 
+
     private $_Client;
+    private $_Reference;
+    private $_postLimit = 5000;
 
     /**
      * function __construct()
@@ -39,6 +40,32 @@ abstract class Service
         $this->host = 'api.productsup.io';
         $this->scheme = 'http';
         $this->api = 'platform';
+    }
+
+    public function setPostLimit($limit)
+    {
+        if ($limit < 1) {
+            throw new Exception('Post limit lower 1 not allowed');
+        } elseif ($limit > 10000) {
+            throw new Exception('Post limit higher 10.000 not allowed');
+        }
+
+        $this->_postLimit = $limit;
+    }
+
+    public function getPostLimit()
+    {
+        return $this->_postLimit;
+    }
+
+    public function setReference(Reference $Reference)
+    {
+        $this->_Reference = $Reference;
+    }
+
+    public function getReference()
+    {
+        return $this->_Reference;
     }
 
     /**

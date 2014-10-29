@@ -7,6 +7,7 @@ class Response
     private $_httpStatus;
     private $_headers;
     private $_body;
+    private $_effectiveUrl;
 
     /**
      * function __construct()
@@ -19,6 +20,7 @@ class Response
         if ($response === false) {
           throw new Exception(curl_error($curl));
         }
+        $this->_effectiveUrl = curl_getinfo($curl, CURLINFO_EFFECTIVE_URL);
         $headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
         list($responseHeaders, $responseBody) = $this->parseHttpResponse($response, $headerSize);
         $this->_httpStatus = curl_getinfo($curl, CURLINFO_HTTP_CODE);
@@ -94,7 +96,16 @@ class Response
      */
     public function getJsonBody()
     {
+        $body = trim($this->_body);
+        if (empty($body)) {
+            return sprintf('Empty Response from Server: %s', $this->_effectiveUrl);
+        }
+
         $data = json_decode($this->_body, true);
+        if (empty($data)) {
+            return sprintf('Empty JSON Response from Server: %s', $this->_effectiveUrl);
+        }
+        
         if($data !== false) {
             return $data;
         }
