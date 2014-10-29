@@ -34,6 +34,6 @@ class Site
 
     public function addReference(Reference $Reference)
     {
-        $this->_references[] = $Reference;
+        $this->_references[] = $Reference->toArray();
     }
 }

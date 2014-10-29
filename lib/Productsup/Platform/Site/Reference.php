@@ -10,6 +10,22 @@ class Reference
     private $_key;
     private $_value;
 
+    public function __toString()
+    {
+        return json_encode(array(
+            'key' => $this->_key, 
+            'value' => $this->_value
+        ));
+    }    
+
+    public function toArray()
+    {
+        return array(
+            'key' => $this->_key, 
+            'value' => $this->_value
+        );
+    }
+
     /**
      * function setKey()
      * 
