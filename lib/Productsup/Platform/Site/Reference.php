@@ -17,8 +17,8 @@ class Reference
      */
     public function setKey($key)
     {
-        if (!preg_match('/^[a-z0-9_]+$/', $key)) {
-            throw new Exception('Invalid Reference Key ([a-z0-9_])');
+        if (!preg_match('/^[a-z0-9_\-]+$/', $key)) {
+            throw new \Exception('Invalid Reference Key ([a-z0-9_]): '. $key);
         }
         $this->_key = $key;
     }

@@ -11,7 +11,7 @@ use Productsup\Platform\Site as PlatformSite;
 class Tags extends Service
 {
     const URL_TAGS_INSERT = '%s://%s/%s/%s/%s/%s/%s';
-    const URL_TAGS_DELETE = '%s://%s/%s/%s/%s/%s/%s/%s';
+    const URL_TAGS_DELETE = '%s://%s/%s/%s/%s/%s/%s';
     const URL_TAGS_GET = '%s://%s/%s/%s/%s/%s/%s';
 
     private $_Site;
@@ -27,7 +27,6 @@ class Tags extends Service
 
         $this->version = 'v1';
         $this->serviceName = 'tags';
-        $this->apiEndpoint = 'sites';
     }
 
     /**
@@ -40,8 +39,8 @@ class Tags extends Service
      */
     public function insert(PlatformTag $Tag)
     {
-        if ($this->_Site === null) {
-            throw new Exception('Site not defined.');
+        if ($this->getReference() === null) {
+            throw new Exception('Reference not defined.');
         }
 
         $InsertRequest = new Request($this->getClient());
@@ -53,9 +52,9 @@ class Tags extends Service
             $this->host,
             $this->api,
             $this->version,
-            $this->apiEndpoint,
-            $this->_Site->id,
-            $this->serviceName
+            $this->serviceName,
+            urlencode($this->getReference()->getKey()),
+            urlencode($this->getReference()->getValue())
         );
 
         $Curl = new Curl();
@@ -92,10 +91,9 @@ class Tags extends Service
             $this->host,
             $this->api,
             $this->version,
-            $this->apiEndpoint,
-            $this->_Site->id,
             $this->serviceName,
-            $siteId
+            urlencode($this->getReference()->getKey()),
+            urlencode($this->getReference()->getValue())
         );
 
         $Curl = new Curl();
@@ -125,9 +123,9 @@ class Tags extends Service
             $this->host,
             $this->api,
             $this->version,
-            $this->apiEndpoint,
-            $this->_Site->id,
-            $this->serviceName
+            $this->serviceName,
+            urlencode($this->getReference()->getKey()),
+            urlencode($this->getReference()->getValue())
         );
 
         $Curl = new Curl();
