@@ -2,10 +2,13 @@
 
 namespace Productsup\Platform;
 
+use Productsup\Platform\Site\Reference as Reference;
+
 class Site
 {
     public $id;
     public $title;
+    private $_references = array();
 
     public function __construct(array $siteJsonResponse = null)
     {
@@ -24,7 +27,13 @@ class Site
     {
         return json_encode(array(
             'id' => $this->id, 
-            'title' => $this->title
+            'title' => $this->title,
+            'references' => $this->_references
         ));
     }    
+
+    public function addReference(Reference $Reference)
+    {
+        $this->_references[] = $Reference;
+    }
 }

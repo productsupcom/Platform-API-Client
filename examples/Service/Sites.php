@@ -38,6 +38,12 @@ $Sites->setProject($Project);
 $Site = new Productsup\Platform\Site();
 $Site->title = "Testsite ".uniqid();
 
+$Reference = new Productsup\Platform\Site\Reference();
+$Reference->setKey('merchant_id');
+$Reference->setValue(1234);
+
+$Site->addReference($Reference);
+
 try {
     $NewSite = $Sites->insert($Site);
 } catch (Exception $e) {
