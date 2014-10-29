@@ -17,7 +17,7 @@ class Curl
                 $body = json_encode($Request->postBody);
                 $requestHeaders['Content-Type'] = 'application/json';
             } else {
-                $body = $Request->postBody;
+                $body = (string) $Request->postBody;
             }
             curl_setopt($curl, CURLOPT_POSTFIELDS, $body);
         }
@@ -32,8 +32,6 @@ class Curl
 
         curl_setopt($curl, CURLOPT_URL, $Request->url);
 
-        var_dump($Request->url);
-        
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $Request->method);
         curl_setopt($curl, CURLOPT_USERAGENT, $Request->getUserAgent());
 

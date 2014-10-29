@@ -24,7 +24,7 @@ class ProductData extends Service
         parent::__construct($Client);
 
         $this->version = 'v1';
-        $this->serviceName = 'product-data';
+        $this->serviceName = 'platform';
         $this->apiEndpoint = 'products';
     }
 
@@ -130,7 +130,7 @@ class ProductData extends Service
         $Curl = new Curl();
         $InsertResponse = $Curl->executeRequest($InsertRequest);
         if ($InsertResponse->getHttpStatus() !== 200) {
-            throw new Exception('Api POST failed');
+            throw new Exception('Api DELETE failed');
         }
 
         return $InsertResponse->getJsonBody();

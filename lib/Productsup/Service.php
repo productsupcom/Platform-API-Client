@@ -17,6 +17,9 @@ abstract class Service
     /** var $serviceName string Service Name */
     public $serviceName;
 
+    /** var $serviceName string Service Name */
+    public $api;
+
     /** var $referenceId string Reference Id */
     public $referenceId;
 
@@ -35,6 +38,7 @@ abstract class Service
         $this->_Client = $Client;
         $this->host = 'api.productsup.io';
         $this->scheme = 'http';
+        $this->api = 'platform';
     }
 
     /**
