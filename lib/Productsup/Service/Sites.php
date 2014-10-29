@@ -37,7 +37,7 @@ class Sites extends Service
     /**
      * function insert()
      * 
-     * creates a new project
+     * creates a new site
      * 
      * @param string $projectName Project Name
      * @return array Response
@@ -85,11 +85,11 @@ class Sites extends Service
      * @param int $projectId Project ID
      * @return array Response
      */
-    public function delete($siteId)
+    public function delete(PlatformSite $Site)
     {
         $DeleteRequest = new Request($this->getClient());
         $DeleteRequest->method = Request::METHOD_DELETE;
-        $DeleteRequest->postBody = $this->_delete;
+        $DeleteRequest->postBody = $Site;
         $DeleteRequest->url = sprintf(
             self::URL_SITES_DELETE,
             $this->scheme,
