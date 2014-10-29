@@ -56,11 +56,11 @@ class Projects extends Service
         }
 
         $response = $InsertResponse->getJsonBody();
-        if ($response === false) {
+        if ($response === false || !isset($response['success']) || !isset($response['project'])) {
             throw new Exception(Exception::E_FAILED_TO_CREATE_PROJECT);
         }
 
-        $PlatformProject = new PlatformProject($response);
+        $PlatformProject = new PlatformProject($response['project']);
         return $PlatformProject;
     }
 

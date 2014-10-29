@@ -7,6 +7,7 @@ use Productsup\Http\Request as Request;
 use Productsup\IO\Curl as Curl;
 use Productsup\Platform\Tag as PlatformTag;
 use Productsup\Platform\Site as PlatformSite;
+use Productsup\Exception as Exception;
 
 class Tags extends Service
 {
@@ -64,7 +65,7 @@ class Tags extends Service
         }
 
         $response = $InsertResponse->getJsonBody();
-        if ($response === false || !isset($response['success']) || $response['success'] === false || !isset($response['site'])) {
+        if ($response === false || !isset($response['success']) || $response['success'] === false || !isset($response['tag'])) {
             throw new Exception(Exception::E_FAILED_TO_CREATE_TAG);
         }
 
