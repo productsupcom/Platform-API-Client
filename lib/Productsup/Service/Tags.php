@@ -30,10 +30,6 @@ class Tags extends Service
         $this->apiEndpoint = 'sites';
     }
 
-    public function setSite(PlatformSite $Site) {
-        $this->_Site = $Site;
-    }
-
     /**
      * function insert()
      * 

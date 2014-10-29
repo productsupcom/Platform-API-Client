@@ -20,15 +20,21 @@ $Client->secret = 'simsalabim';
  */
 $Tags = new Productsup\Service\Tags($Client);
 
+$Reference = new Productsup\Platform\Site\Reference();
+
 /**
- * Define Site
- * 
- * In order to manage tags which belong to a site, you have to define a
- * site.
- */
-$Site = new Productsup\Platform\Site();
-$Site->id = 123;
-$Tags->setSite($Site);
+ * In case you have a productsup site id 
+ **/
+$Reference->setKey($Reference::REFERENCE_SITE);
+$Reference->setValue(1234); // Site ID
+
+/**
+ * In case you have a productsup site id 
+ **/
+$Reference->setKey('merchant_id');
+$Reference->setValue(1234); // Site ID
+
+$Tags->setReference($Reference);
 
 /**
  * Create a new tag
