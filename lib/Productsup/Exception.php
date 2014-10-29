@@ -61,6 +61,10 @@ class Exception extends \Exception
                 $message = 'Unknown Error';
         }
 
+        if ($userInfo !== null) {
+            $message = sprintf('%s: %s', $message, $userInfo);
+        }
+
         parent::__construct($message, $code);
     }
 }
