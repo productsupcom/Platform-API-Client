@@ -29,7 +29,7 @@ $Reference->setKey($Reference::REFERENCE_SITE);
 $Reference->setValue(1234); // Site ID
 
 /**
- * In case you have a productsup site id 
+ * In case you want to use your own reference
  **/
 $Reference->setKey('merchant_id');
 $Reference->setValue(1234); // Site ID
