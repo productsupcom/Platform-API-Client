@@ -5,6 +5,7 @@ use Productsup\Service as Service;
 use Productsup\Client as Client;
 use Productsup\Http\Request as Request;
 use Productsup\IO\Curl as Curl;
+use Productsup\Exception as Exception;
 
 class ProductData extends Service
 {
@@ -88,7 +89,7 @@ class ProductData extends Service
     private function submit()
     {
         if($this->getReference() === null) {
-            throw new \Exception('Missing Reference');
+            throw new Exception(Exception::E_MISSING_REFERENCE);
         }
 
         $response = array();
@@ -157,7 +158,7 @@ class ProductData extends Service
         $DeleteResponse = $Curl->executeRequest($DeleteRequest);
 
         if ($DeleteResponse->getHttpStatus() !== 200) {
-            throw new Exception('Api POST failed');
+            throw new Exception(Exception::E_DELETE_REQUEST_FAILED);
         }
 
         return $DeleteResponse->getJsonBody();       
@@ -192,7 +193,7 @@ class ProductData extends Service
         $Curl = new Curl();
         $InsertResponse = $Curl->executeRequest($InsertRequest);
         if ($InsertResponse->getHttpStatus() !== 200) {
-            throw new Exception('Api DELETE failed');
+            throw new Exception(Exception::E_INSERT_REQUEST_FAILED);
         }
 
         return $InsertResponse->getJsonBody();

@@ -6,6 +6,7 @@ use Productsup\Client as Client;
 use Productsup\Http\Request as Request;
 use Productsup\IO\Curl as Curl;
 use Productsup\Platform\Project as PlatformProject;
+use Productsup\Exception as Exception;
 
 class Projects extends Service
 {
@@ -51,12 +52,12 @@ class Projects extends Service
         $Curl = new Curl();
         $InsertResponse = $Curl->executeRequest($InsertRequest);
         if ($InsertResponse->getHttpStatus() !== 200) {
-            throw new Exception('Api POST failed');
+            throw new Exception(Exception::E_INSERT_REQUEST_FAILED);
         }
 
         $response = $InsertResponse->getJsonBody();
         if ($response === false) {
-            throw new Exception('Failed to create Project');
+            throw new Exception(Exception::E_FAILED_TO_CREATE_PROJECT);
         }
 
         $PlatformProject = new PlatformProject($response);
@@ -90,12 +91,12 @@ class Projects extends Service
         $DeleteResponse = $Curl->executeRequest($DeleteRequest);
 
         if ($DeleteResponse->getHttpStatus() !== 200) {
-            throw new Exception('Api DELETE failed');
+            throw new Exception(Exception::E_DELETE_REQUEST_FAILED);
         }
 
         $response = $DeleteResponse->getJsonBody(); 
         if ($response === false || $response['success'] === false) {
-            throw new Exception('Failed to delete project.');
+            throw new Exception(Exception::E_FAILED_TO_DELETE_PROJECT);
         }
         return true;
     }
@@ -124,12 +125,12 @@ class Projects extends Service
         $GetResponse = $Curl->executeRequest($GetRequest);
 
         if ($GetResponse->getHttpStatus() !== 200) {
-            throw new \Exception('Api GET failed');
+            throw new Exception(Exception::E_GET_REQUEST_FAILED);
         }
 
         $response = $GetResponse->getJsonBody();
         if ($response === false || !isset($response['success']) || $response['success'] === false) {
-            throw new \Exception('Failed to get project list');
+            throw new Exception(Exception::E_FAILED_TO_GET_LIST);
         }
 
         $list = array();

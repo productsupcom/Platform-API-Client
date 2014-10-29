@@ -42,6 +42,10 @@ $Reference = new Productsup\Platform\Site\Reference();
 $Reference->setKey('merchant_id');
 $Reference->setValue(1234);
 
+$Reference->setKey($Reference::REFERENCE_SITE);
+$Reference->setValue(1234); // Site ID
+
+
 $Site->addReference($Reference);
 
 try {

@@ -3,6 +3,7 @@
 namespace Productsup\Platform;
 
 use Productsup\Platform\Site\Reference as Reference;
+use Productsup\Exception as Exception;
 
 class Site
 {
@@ -15,7 +16,7 @@ class Site
         if ($siteJsonResponse !== null) {
             if(!isset($siteJsonResponse['id'])
             || !isset($siteJsonResponse['title'])) {
-                throw new \Exception('Invalis JSON for Site Object');
+                throw new Exception(Exception::E_INVALID_JSON_FOR_OBJECT);
             }
 
             $this->id = $siteJsonResponse['id'];
@@ -34,6 +35,9 @@ class Site
 
     public function addReference(Reference $Reference)
     {
+        if ($Reference->getKey() == $Reference::REFERENCE_SITE) {
+            throw new Exception(Exception::E_REFERENCE_TO_SITE);
+        }
         $this->_references[] = $Reference->toArray();
     }
 }

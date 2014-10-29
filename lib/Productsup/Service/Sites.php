@@ -7,6 +7,7 @@ use Productsup\Http\Request as Request;
 use Productsup\IO\Curl as Curl;
 use Productsup\Platform\Project as PlatformProject;
 use Productsup\Platform\Site as PlatformSite;
+use Productsup\Exception as Exception;
 
 class Sites extends Service
 {
@@ -65,12 +66,12 @@ class Sites extends Service
         $Curl = new Curl();
         $InsertResponse = $Curl->executeRequest($InsertRequest);
         if ($InsertResponse->getHttpStatus() !== 200) {
-            throw new \Exception('Api POST failed');
+            throw new Exception(Exception::E_INSERT_REQUEST_FAILED);
         }
 
         $response = $InsertResponse->getJsonBody();
         if ($response === false || !isset($response['success']) || $response['success'] === false || !isset($response['site'])) {
-            throw new \Exception('Failed to create Site');
+            throw new Exception(Exception::E_FAILED_TO_CREATE_SITE);
         }
 
         $PlatformSite = new PlatformSite($response['site']);
@@ -106,7 +107,7 @@ class Sites extends Service
         $DeleteResponse = $Curl->executeRequest($DeleteRequest);
 
         if ($DeleteResponse->getHttpStatus() !== 200) {
-            throw new Exception('Api DELETE failed');
+            throw new Exception(Exception::E_DELETE_REQUEST_FAILED);
         }
 
         return $DeleteResponse->getJsonBody(); 
@@ -138,12 +139,12 @@ class Sites extends Service
         $GetResponse = $Curl->executeRequest($GetRequest);
 
         if ($GetResponse->getHttpStatus() !== 200) {
-            throw new \Exception('Api GET failed');
+            throw new Exception(Exception::E_GET_REQUEST_FAILED);
         }
 
         $response = $GetResponse->getJsonBody();
         if ($response === false || !isset($response['success']) || $response['success'] === false) {
-            throw new \Exception('Failed to get site list');
+            throw new Exception(Exception::E_FAILED_TO_GET_LIST);
         }
 
         $list = array();

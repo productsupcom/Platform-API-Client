@@ -1,6 +1,7 @@
 <?php
 
 namespace Productsup\Platform;
+use Productsup\Exception as Exception;
 
 class Project
 {
@@ -12,7 +13,7 @@ class Project
         if ($projectJsonResponse !== null) {
             if(!isset($projectJsonResponse['id'])
             || !isset($projectJsonResponse['title'])) {
-                throw new \Exception('Invalid JSON for Project Object');
+                throw new Exception(Exception::E_INVALID_JSON_FOR_OBJECT);
             }
 
             $this->id = $projectJsonResponse['id'];

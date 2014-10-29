@@ -60,12 +60,12 @@ class Tags extends Service
         $Curl = new Curl();
         $InsertResponse = $Curl->executeRequest($InsertRequest);
         if ($InsertResponse->getHttpStatus() !== 200) {
-            throw new \Exception('Api POST failed');
+            throw new Exception(Exception::E_INSERT_REQUEST_FAILED);
         }
 
         $response = $InsertResponse->getJsonBody();
         if ($response === false || !isset($response['success']) || $response['success'] === false || !isset($response['site'])) {
-            throw new \Exception('Failed to create tag');
+            throw new Exception(Exception::E_FAILED_TO_CREATE_TAG);
         }
 
         $PlatformTag = new PlatformTag($response['tag']);
@@ -100,7 +100,7 @@ class Tags extends Service
         $DeleteResponse = $Curl->executeRequest($DeleteRequest);
 
         if ($DeleteResponse->getHttpStatus() !== 200) {
-            throw new Exception('Api DELETE failed');
+            throw new Exception(Exception::E_DELETE_REQUEST_FAILED);
         }
 
         return $DeleteResponse->getJsonBody(); 
@@ -132,12 +132,12 @@ class Tags extends Service
         $GetResponse = $Curl->executeRequest($GetRequest);
 
         if ($GetResponse->getHttpStatus() !== 200) {
-            throw new \Exception('Api GET failed');
+            throw new Exception(Exception::E_GET_REQUEST_FAILED);
         }
 
         $response = $GetResponse->getJsonBody();
         if ($response === false || !isset($response['success']) || $response['success'] === false) {
-            throw new \Exception('Failed to get tag list');
+            throw new Exception(Exception::E_FAILED_TO_GET_LIST);
         }
 
         $list = array();

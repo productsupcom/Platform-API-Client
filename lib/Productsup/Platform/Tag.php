@@ -1,6 +1,7 @@
 <?php
 
 namespace Productsup\Platform;
+use Productsup\Exception as Exception;
 
 class Tag
 {
@@ -12,7 +13,7 @@ class Tag
         if ($tagJsonResponse !== null) {
             if(!isset($tagJsonResponse['key'])
             || !isset($tagJsonResponse['value'])) {
-                throw new \Exception('Invalis JSON for Tag Object');
+                throw new Exception(Exception::E_INVALID_JSON_FOR_OBJECT);
             }
 
             $this->key = $tagJsonResponse['key'];
