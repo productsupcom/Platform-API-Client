@@ -4,6 +4,6 @@ Add this to your require section
 
 ```
 "require": {
-    "productsupcom/product-api-client": "dev-master"
+    "productsupcom/platform-api-client": "dev-master"
 }
 ```
