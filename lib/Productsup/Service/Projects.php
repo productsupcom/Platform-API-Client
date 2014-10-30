@@ -17,7 +17,7 @@ class Projects extends Service
     /**
      * function __construct()
      *
-     * @param Productsup\Client A client object
+     * @param \Productsup\Client A client object
      */
     public function __construct(Client $Client)
     {
@@ -33,7 +33,7 @@ class Projects extends Service
      * creates a new project
      * 
      * @param string $projectTitle Project Title
-     * @return Productsup\Platform\Project Project
+     * @return \Productsup\Platform\Project Project
      */
     public function insert(PlatformProject $Project)
     {
@@ -69,7 +69,7 @@ class Projects extends Service
      * 
      * deletes a project and all sites in that project
      * 
-     * @param Productsup\Platform\Project $Project Project Object
+     * @param \Productsup\Platform\Project $Project Project Object
      * @return boolean True on success
      */
     public function delete(PlatformProject $Project)

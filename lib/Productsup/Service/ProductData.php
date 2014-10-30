@@ -19,7 +19,7 @@ class ProductData extends Service
     /**
      * function __construct()
      *
-     * @param Productsup\Client A client object
+     * @param \Productsup\Client A client object
      */
     public function __construct(Client $Client)
     {

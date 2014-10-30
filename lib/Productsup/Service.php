@@ -32,7 +32,7 @@ abstract class Service
     /**
      * function __construct()
      *
-     * @param Productsup\Client A client object
+     * @param \Productsup\Client A client object
      */
     public function __construct(Client $Client)
     {
@@ -71,9 +71,9 @@ abstract class Service
     /**
      * function getClient()
      *
-     * @return Productsup\Client A client object
+     * @return \Productsup\Client A client object
      */
-    public function getCLient()
+    public function getClient()
     {
         return $this->_Client;
     }

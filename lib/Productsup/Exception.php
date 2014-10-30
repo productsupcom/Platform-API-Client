@@ -1,7 +1,6 @@
 <?php
 
 namespace Productsup;
-use Productsup\Exception as Exception;
 
 class Exception extends \Exception
 {
