@@ -37,7 +37,7 @@ abstract class Service
     public function __construct(Client $Client)
     {
         $this->_Client = $Client;
-        $this->host = 'api.productsup.io';
+        $this->host = 'api.productsup.com';
         $this->scheme = 'http';
         $this->api = 'platform';
     }
