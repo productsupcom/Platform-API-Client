@@ -21,7 +21,7 @@ $Client->secret = 'simsalabim';
 $Projects = new Productsup\Service\Projects($Client);
 
 /* Override the host to test on development instance */
-$Projects->host = 'local.api.productsup.com';
+// $Projects->host = 'local.api.productsup.com';
 
 /**
  * Create a new project
