@@ -7,3 +7,22 @@ Add this to your require section
     "productsupcom/platform-api-client": "dev-master"
 }
 ```
+
+# Installation (without composer)
+
+If you do not want to use composer, you can download or git clone the project and require the autoload.php in the root folder.
+```
+git clone https://github.com/productsupcom/Platform-API-Client.git
+```
+
+```php
+require_once(__DIR__.'/Platform-API-Client/autoload.php');
+```
+
+# Requirements
+ * PHP 5.2+
+ * [PHP cURL](http://php.net/manual/en/curl.installation.php)
+ 
+# Basic usage
+see [/examples/Service/Projects.php](https://github.com/productsupcom/Platform-API-Client/blob/master/examples/Service/Projects.php) for example usage.
+
