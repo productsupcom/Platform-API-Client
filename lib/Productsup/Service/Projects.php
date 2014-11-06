@@ -1,143 +1,88 @@
 <?php
 
 namespace Productsup\Service;
-use Productsup\Service as Service;
-use Productsup\Client as Client;
-use Productsup\Http\Request as Request;
-use Productsup\IO\Curl as Curl;
+use Productsup\Platform\Project;
+use Productsup\Http\Request;
 use Productsup\Platform\Project as PlatformProject;
-use Productsup\Exception as Exception;
+use Productsup\Exceptions;
 
-class Projects extends Service
-{
-    const URL_PROJECTS_INSERT = '%s://%s/%s/%s/%s';
-    const URL_PROJECTS_DELETE = '%s://%s/%s/%s/%s/%s';
-    const URL_PROJECTS_GET = '%s://%s/%s/%s/%s';
+class Projects extends Service {
+    protected $serviceName = 'projects';
 
     /**
-     * function __construct()
-     *
-     * @param Productsup\Client A client object
-     */
-    public function __construct(Client $Client)
-    {
-        parent::__construct($Client);
-
-        $this->version = 'v1';
-        $this->serviceName = 'projects';
-    }
-
-    /**
-     * function insert()
-     * 
      * creates a new project
-     * 
-     * @param string $projectTitle Project Title
-     * @return Productsup\Platform\Project Project
+     *
+     * @param \Productsup\Platform\Project $Project
+     * @internal param string $projectTitle Project Title
+     * @return \Productsup\Platform\Project Project
      */
     public function insert(PlatformProject $Project)
     {
-        $InsertRequest = new Request($this->getClient());
-        $InsertRequest->method = Request::METHOD_POST;
-        $InsertRequest->postBody = $Project;
-        $InsertRequest->url = sprintf(
-            self::URL_PROJECTS_INSERT,
-            $this->scheme,
-            $this->host,
-            $this->api,
-            $this->version,
-            $this->serviceName
-        );
+        $request = $this->getRequest();
+        $request->method = Request::METHOD_POST;
+        $request->postBody = $Project->toArray();
 
-        $Curl = new Curl();
-        $InsertResponse = $Curl->executeRequest($InsertRequest);
-        if ($InsertResponse->getHttpStatus() !== 200) {
-            throw new Exception(Exception::E_INSERT_REQUEST_FAILED);
+        $data = $this->executeRequest($request);
+
+        $PlatformProject = new PlatformProject($data['Projects'][0]);
+        return $PlatformProject;
+    }
+
+    public function update(PlatformProject $Project) {
+        $request = $this->getRequest();
+        $request->method = Request::METHOD_PUT;
+        $request->postBody = $Project->toArray();
+        if($Project->id) {
+            $request->url .= '/'.$Project->id;
         }
-
-        $response = $InsertResponse->getJsonBody();
-        if ($response === false || !isset($response['success']) || !isset($response['project'])) {
-            throw new Exception(Exception::E_FAILED_TO_CREATE_PROJECT);
-        }
-
-        $PlatformProject = new PlatformProject($response['project']);
+        $data = $this->executeRequest($request);
+        $PlatformProject = new PlatformProject($data['Projects'][0]);
         return $PlatformProject;
     }
 
     /**
      * function delete()
-     * 
+     *
      * deletes a project and all sites in that project
-     * 
-     * @param Productsup\Platform\Project $Project Project Object
+     *
+     * @param $id
+     * @internal param \Productsup\Platform\Project $Project Project Object
      * @return boolean True on success
      */
-    public function delete(PlatformProject $Project)
-    {
-        $DeleteRequest = new Request($this->getClient());
-        $DeleteRequest->method = Request::METHOD_DELETE;
-        $DeleteRequest->postBody = $Project;
-        $DeleteRequest->url = sprintf(
-            self::URL_PROJECTS_INSERT,
-            $this->scheme,
-            $this->host,
-            $this->api,
-            $this->version,
-            $this->serviceName,
-            $Project->id
-        );
-
-        $Curl = new Curl();
-        $DeleteResponse = $Curl->executeRequest($DeleteRequest);
-
-        if ($DeleteResponse->getHttpStatus() !== 200) {
-            throw new Exception(Exception::E_DELETE_REQUEST_FAILED);
+    public function delete($id) {
+        if($id instanceof Project) {
+            $id = $id->id;
         }
+        $request = $this->getRequest();
+        $request->method = Request::METHOD_DELETE;
+        $request->url .= '/'.$id;
 
-        $response = $DeleteResponse->getJsonBody(); 
-        if ($response === false || $response['success'] === false) {
-            throw new Exception(Exception::E_FAILED_TO_DELETE_PROJECT);
-        }
-        return true;
+        $response = $this->getIoHandler()->executeRequest($request);
+        $data = $response->getData();
+        return isset($data['success']) ? $data['success'] : false;
     }
 
     /**
-     * function get()
-     * 
      * get a list of projects
-     * 
-     * @return array List of Productsup\Platform\Project
+     * @param null|int $id
+     * @throws \Productsup\Exceptions\ServerException
+     * @throws \Productsup\Exceptions\ClientException
+     * @return \Productsup\Platform\Project[]
      */
-    public function get()
-    {
-        $GetRequest = new Request($this->getClient());
-        $GetRequest->method = Request::METHOD_GET;
-        $GetRequest->url = sprintf(
-            self::URL_PROJECTS_INSERT,
-            $this->scheme,
-            $this->host,
-            $this->api,
-            $this->version,
-            $this->serviceName
-        );
-
-        $Curl = new Curl();
-        $GetResponse = $Curl->executeRequest($GetRequest);
-
-        if ($GetResponse->getHttpStatus() !== 200) {
-            throw new Exception(Exception::E_GET_REQUEST_FAILED);
+    public function get($id = null) {
+        $request = $this->getRequest();
+        $request->method = Request::METHOD_GET;
+        if($id) {
+            $request->url .= '/'.$id;
         }
-
-        $response = $GetResponse->getJsonBody();
-        if ($response === false || !isset($response['success']) || $response['success'] === false) {
-            throw new Exception(Exception::E_FAILED_TO_GET_LIST);
-        }
-
+        $response = $this->getIoHandler()->executeRequest($request);
+        $data = $response->getData();
         $list = array();
-        foreach ($response['peojects'] as $project) {
+        foreach ($data['Projects'] as $project) {
             $list[] = new PlatformProject($project);
         }
-
         return $list;
     }
+
+
 }

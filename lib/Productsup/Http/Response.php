@@ -1,114 +1,64 @@
 <?php
 
 namespace Productsup\Http;
+use Productsup\Exceptions;
 
-class Response
-{
+class Response {
     private $_httpStatus;
     private $_headers;
     private $_body;
-    private $_effectiveUrl;
+    private $_data;
 
     /**
-     * function __construct()
-     * 
-     * @param $curl Resource A resource from curl_init()
+     * @param $statusCode
+     * @param $headers
+     * @param $body
      */
-    public function __construct($curl)
-    {
-        $response = curl_exec($curl);
-        if ($response === false) {
-          throw new Exception(curl_error($curl));
+    public function __construct($statusCode, $headers,$body) {
+        $this->_httpStatus = $statusCode;
+        $this->_headers = $headers;
+        $this->_body = $body;
+        $this->errorHandling();
+    }
+
+    /**
+     * tries to decode received reply from server
+     * @return array
+     */
+    public function getData() {
+        if(!$this->_data) {
+            $this->_data = $this->decodeJson();
         }
-        $this->_effectiveUrl = curl_getinfo($curl, CURLINFO_EFFECTIVE_URL);
-        $headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
-        list($responseHeaders, $responseBody) = $this->parseHttpResponse($response, $headerSize);
-        $this->_httpStatus = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        $this->_headers = $responseHeaders;
-        $this->_body = $responseBody;
+        return $this->_data;
     }
 
     /**
-     * function parseHttpResponse()
-     * 
-     * returns HTTP response header and body splitted 
-     * 
-     * @param string $response A complete HTTP Response string
-     * @param int $headerSite Size of the HTTP Header portion of the Response 
-     * @return array An array of header and body strings
+     * throws exceptions if the api replied with an error
+     * @throws \Productsup\Exceptions\ServerException
+     * @throws \Productsup\Exceptions\ClientException
      */
-    private function parseHttpResponse($response, $headerSize)
-    {
-        $header = trim(substr($response, 0, $headerSize));
-        $body = trim(substr($response, $headerSize));
-        return array($header, $body);
-    }
-
-    /**
-     * function getHttpStatus()
-     * 
-     * returns HTTP response status code
-     * 
-     * @return int HTTP status code
-     */
-    public function getHttpStatus()
-    {
-        return $this->_httpStatus;
-    }
-
-    /**
-     * function getHeaders()
-     * 
-     * returns an array of HTTP response header elements
-     * 
-     * @return array HTTP response headers
-     */
-    public function getHeaders()
-    {
-        $headerArray = array();
-        $headers = explode("\n", $this->_headers);
-        foreach($headers as $header)
-        {
-            list($key, $value) = explode(":", $header);
-            $headerArray[trim($key)] = trim($value);
+    private function errorHandling() {
+        $data = $this->getData();
+        if($this->_httpStatus >= 500) {
+            $message = isset($data['message']) ? $data['message'] : 'internal server error';
+            throw new Exceptions\ServerException($message,$this->_httpStatus);
+        } elseif($this->_httpStatus >= 400) {
+            $message = isset($data['message']) ? $data['message'] : 'client error';
+            throw new Exceptions\ClientException($message,$this->_httpStatus);
+        } elseif(!isset($data['success']) || !$data['success']) {
+            $message = isset($data['message']) ? $data['message'] : 'invalid response format';
+            throw new Exceptions\ServerException($message);
         }
-        return $headerArray;
     }
 
     /**
-     * function getBody()
-     * 
-     * returns the HTTP response body
-     * 
-     * @return string HTTP response body
-     */
-    public function getBody()
-    {
-        return $this->_body;
-    }
-
-    /**
-     * function getJsonBody()
-     * 
      * returns an array of a HTTP JSON response body if possible
-     * 
-     * @return array JSON Array
+     *
+     * @throws \Exception
+     * @return array data parsed from JSON response
      */
-    public function getJsonBody()
-    {
+    private function decodeJson() {
         $body = trim($this->_body);
-        if (empty($body)) {
-            return sprintf('Empty Response from Server: %s', $this->_effectiveUrl);
-        }
-
-        $data = json_decode($this->_body, true);
-        if (empty($data)) {
-            return sprintf('Empty JSON Response from Server: %s', $this->_effectiveUrl);
-        }
-        
-        if($data !== false) {
-            return $data;
-        }
-        throw new Exception('Invalid JSON Body');
+        return json_decode($body, true);
     }
 }
