@@ -1,0 +1,62 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: chris
+ * Date: 07.11.14
+ * Time: 09:41
+ */
+
+namespace Productsup\Platform;
+
+
+class DataModel {
+    public $id;
+    /**
+     * @param null|array $data data to initialise
+     */
+    public function __construct($data = null) {
+        if(is_array($data)) {
+            return $this->fromArray($data);
+        }
+        return $this;
+    }
+
+    /**
+     * @param array $data
+     * @return static
+     */
+    public function fromArray(array $data) {
+        $public = $this->getPublicProperties();
+        foreach($data as $key => $value) {
+            if(in_array($key,$public)) {
+                $this->$key = $value;
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * cast data to an array
+     * @return array
+     */
+    public function toArray() {
+        $result = array();
+        foreach($this->getPublicProperties() as $property) {
+            $result[$property] = $this->$property;
+        }
+        return $result;
+    }
+
+    /**
+     * returns all public properties of current class
+     * @return array
+     */
+    protected function getPublicProperties() {
+        $reflect = new \ReflectionClass($this);
+        $result = array();
+        foreach($reflect->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
+            $result[] = $property->getName();
+        }
+        return $result;
+    }
+} 

@@ -4,6 +4,7 @@ namespace Productsup\Service;
 use Productsup\Client;
 use Productsup\Http\Request;
 use Productsup\IO\Curl;
+use Productsup\Platform\DataModel;
 
 abstract class Service
 {
@@ -34,6 +35,74 @@ abstract class Service
         $this->_Client = $Client;
     }
 
+    /**
+     * get a list of projects
+     * @param null|int $id
+     * @throws \Productsup\Exceptions\ServerException
+     * @throws \Productsup\Exceptions\ClientException
+     * @return \Productsup\Platform\DataModel[]
+     */
+    protected function _get($id = null) {
+        $request = $this->getRequest();
+        $request->method = Request::METHOD_GET;
+        if($id) {
+            $request->url .= '/'.$id;
+        }
+        $response = $this->getIoHandler()->executeRequest($request);
+        $data = $response->getData();
+        $list = array();
+        foreach ($data[ucfirst($this->serviceName)] as $project) {
+            $list[] = $this->getDataModel()->fromArray($project);
+        }
+        return $list;
+    }
+
+    /**
+     * deletes the resources identified by given id
+     * @param $id
+     * @return bool true on success
+     */
+    protected function _delete($id) {
+        $request = $this->getRequest();
+        $request->method = Request::METHOD_DELETE;
+        $request->url .= '/'.$id;
+
+        $response = $this->getIoHandler()->executeRequest($request);
+        $data = $response->getData();
+        return isset($data['success']) ? $data['success'] : false;
+    }
+
+    /**
+     * @param DataModel $dataModel
+     * @return static
+     */
+    protected function _insert($dataModel) {
+        $request = $this->getRequest();
+        $request->method = Request::METHOD_POST;
+        $request->postBody = $dataModel->toArray();
+        $data = $this->executeRequest($request);
+        return $this->getDataModel()->fromArray($data[ucfirst($this->serviceName)][0]);
+    }
+
+    /**
+     * @param DataModel $dataModel
+     * @return static
+     */
+    protected function _update($dataModel) {
+        $request = $this->getRequest();
+        $request->method = Request::METHOD_PUT;
+        $request->postBody = $dataModel->toArray();
+        if($dataModel->id) {
+            $request->url .= '/'.$dataModel->id;
+        }
+        $data = $this->executeRequest($request);
+        return $this->getDataModel()->fromArray($data[ucfirst($this->serviceName)][0]);
+    }
+
+    /** @return DataModel */
+    protected abstract function getDataModel();
+
+
     public function setPostLimit($limit)
     {
         if ($limit < 1) {
@@ -53,7 +122,7 @@ abstract class Service
     /**
      * @return Client
      */
-    public function getCLient()
+    public function getClient()
     {
         return $this->_Client;
     }

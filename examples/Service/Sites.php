@@ -20,54 +20,86 @@ $Client->secret = 'simsalabim';
  */
 $Sites = new Productsup\Service\Sites($Client);
 
+
 /**
- * Define Project
- * 
- * In order to manage sites which belong to a project, you have to define a
- * project.
+ * getting all sites:
  */
-$Project = new Productsup\Platform\Project();
-$Project->id = 123;
+$SiteList = $Sites->get();
+echo "\e[32mGet all your sites: \e[0m".PHP_EOL;
+foreach($SiteList as $siteObj) {
+    echo $siteObj->id.' '.$siteObj->domain.PHP_EOL;
+}
+
+
+
+$SiteList = $Sites->get(252666);
+echo "\e[32mGet one site by it's id: \e[0m".PHP_EOL;
+print_r($SiteList);
+
+echo "\e[32mGetting a site that does not exist results in an ClientException: \e[0m".PHP_EOL;
+
+try {
+    $SiteList = $Sites->get(-1);
+} catch(\Productsup\Exceptions\ClientException $e) {
+    echo $e->getCode().': '.$e->getMessage().PHP_EOL;
+}
+
+/**
+ * you can also get only sites for a certain project,
+ * to do so you have to set the project object to the service as a reference:
+ */
+$Project = new \Productsup\Platform\Project();
+$Project->id = 9659;
+
 $Sites->setProject($Project);
+$SiteList = $Sites->get();
+echo "\e[32mGetting a site list for a certain project\e[0m".PHP_EOL;
+print_r($SiteList);
+
 
 /**
- * Create a new site
- * 
- * A new site only needs a title
- **/
-$Site = new Productsup\Platform\Site();
-$Site->title = "Testsite ".uniqid();
-
-$Reference = new Productsup\Platform\Site\Reference();
-$Reference->setKey('merchant_id');
-$Reference->setValue(1234);
-
-$Site->addReference($Reference);
-
-try {
-    $NewSite = $Sites->insert($Site);
-} catch (Exception $e) {
-    // Handle Exception
-}
-
-/**
- * Get list of sites in the defined project 
+ * to insert one project, you need a reference to the project
+ * you can also create a new one:
  */
-$sites = array();
-try {
-    $sites = $Sites->get();
-} catch (Exception $e) {
-    // Handle Exception
-}
 
-foreach ($sites as $Site) {
-    echo sprintf('%s: %s', $Site->id, $Site->title).PHP_EOL;
-}
+$projectObject = new \Productsup\Platform\Project();
+$projectObject->name = 'example project '.date('Y-m-d H:i:s');
+$Projects = new \Productsup\Service\Projects($Client);
+$newProject = $Projects->insert($projectObject);
+
+$SitesService = new \Productsup\Service\Sites($Client);
+$SitesService->setProject($newProject);
+
+$siteObject = new \Productsup\Platform\Site();
+$siteObject->domain = 'new example site';
+
+$newSite = $SitesService->insert($siteObject);
+echo "\e[32mnew inserted site:\e[0m".PHP_EOL;
+print_r($newSite);
 
 /**
- * Delete a site
+ * to update the site entry, you can send the edited site object
  */
-if (isset($NewSite)) {
-    $result = $Sites->delete($NewSite);
-    var_dump($result);
-}
+$newSite->domain = 'updated site name';
+$updatedSite = $SitesService->update($newSite);
+echo "\e[32mupdated site:\e[0m".PHP_EOL;
+print_r($updatedSite);
+
+/**
+ * you can also delete sites:
+ */
+$result = $SitesService->delete($updatedSite);
+echo "\e[32mresult of deleting one site:\e[0m".PHP_EOL;
+var_dump($result);
+
+
+/**
+ * you can also use tags, to identify your site:
+ */
+$SitesService = new \Productsup\Service\Sites($Client);
+$tag = new \Productsup\Platform\Tag();
+$tag->key = 'test';
+$tag->title = 'demo1234';
+$taggedSite = $SitesService->get($tag);
+echo "\e[32msite received from a tag:\e[0m".PHP_EOL;
+print_r($taggedSite);
