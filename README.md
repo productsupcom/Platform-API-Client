@@ -20,7 +20,7 @@ require_once(__DIR__.'/Platform-API-Client/autoload.php');
 ```
 
 # Requirements
- * PHP 5.2+
+ * PHP 5.3+
  * [PHP cURL](http://php.net/manual/en/curl.installation.php)
  
 # Basic usage
