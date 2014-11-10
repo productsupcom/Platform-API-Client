@@ -2,6 +2,7 @@
 
 namespace Productsup\Service;
 use Productsup\Client;
+use Productsup\Exceptions\ClientException;
 use Productsup\Http\Request;
 use Productsup\IO\Curl;
 use Productsup\Platform\DataModel;
@@ -25,6 +26,13 @@ abstract class Service
 
     /** @var \Productsup\Client Client */
     protected $_Client;
+
+    /** @var string service name of the parent (e.g. "projects" for "sites") */
+    protected $parent;
+
+    /** @var  mixed|DataModel the parent object referring to the current service (e.g. DataModel\Project for sites) */
+    protected $_parentObject;
+
     protected $_postLimit = 5000;
 
 
@@ -63,6 +71,9 @@ abstract class Service
      * @return bool true on success
      */
     protected function _delete($id) {
+        if(empty($id)) {
+            throw new ClientException('you have to provide an id, or an object with an id for deleting');
+        }
         $request = $this->getRequest();
         $request->method = Request::METHOD_DELETE;
         $request->url .= '/'.$id;
@@ -142,8 +153,15 @@ abstract class Service
      * @return string
      */
     protected function getBaseUrl() {
-        return $this->scheme.'://'.$this->host.'/'.$this->api.'/'.$this->version.'/'.$this->serviceName;
+        $url = $this->scheme.'://'.$this->host.'/'.$this->api.'/'.$this->version.'/';
+
+        if($this->parent && $this->_parentObject) {
+            $url .= $this->parent.'/'.$this->_parentObject->id.'/';
+        }
+        $url .= $this->serviceName;
+        return $url;
     }
+
 
     /**
      * returns the class that handles network requests, right now only Curl is supported

@@ -1,11 +1,11 @@
 <?php
-    
+
 include __DIR__.'/../../vendor/autoload.php';
 
 /**
  * Authentication
  *
- * You'll get the client id and secret at the plaform (API Access) 
+ * You'll get the client id and secret at the plaform (API Access)
  **/
 $Client = new Productsup\Client();
 $Client->id = 1234;
@@ -13,7 +13,7 @@ $Client->secret = 'simsalabim';
 
 /**
  * Initialize the Projects Service where you can
- * 
+ *
  * Create a new project (Projects->insert())
  * Delete a project (and all related sites) (Projects->delete())
  * Get a list of sites (Projects->get())
@@ -25,7 +25,7 @@ $Projects = new Productsup\Service\Projects($Client);
 
 /**
  * Create a new project
- * 
+ *
  * A new project only needs a title
  **/
 $Project = new Productsup\Platform\Project();
@@ -55,7 +55,7 @@ try {
  * Get list of projects in your account
  */
 $projects = $Projects->get();
-echo "\e[32mall projects belonging to the identified client: \e[0m".PHP_EOL;
+\Productsup\Utils\CommandLine::infoText('all projects belonging to the identified client: ');
 foreach ($projects as $Project) {
     echo sprintf('%s: %s', $Project->id, $Project->name).PHP_EOL;
 }
@@ -69,19 +69,19 @@ $Project = new Productsup\Platform\Project();
 $Project->name = "Testproject ".uniqid();
 
 $NewProject = $Projects->insert($Project);
-echo "\e[32minserted a new project, and got as result: \e[0m".PHP_EOL;
+\Productsup\Utils\CommandLine::infoText('inserted a new project, and got as result: ');
 print_r($NewProject);
 
 $insertedId = $NewProject->id; // remembering the id, so we can use it for other operations
 
-echo "\e[32mid of the new project: \e[0m".PHP_EOL;
+\Productsup\Utils\CommandLine::infoText('id of the new project: ');
 print_r($insertedId);
 echo PHP_EOL;
 /**
  * get one project, identified by its id:
  */
 $getResonse = $Projects->get($insertedId);
-echo "\e[32mGot this as a result for the get Request: \e[0m".PHP_EOL;
+\Productsup\Utils\CommandLine::infoText('Got this as a result for the get Request: ');
 print_r($getResonse);
 
 /**
@@ -91,7 +91,7 @@ $receivedProject = $getResonse[0];
 $receivedProject->name = 'updated projectname';
 
 $updatedProject = $Projects->update($receivedProject);
-echo "\e[32mGot this as a result for the update Request: \e[0m".PHP_EOL;
+\Productsup\Utils\CommandLine::infoText('Got this as a result for the update Request: ');
 print_r($updatedProject);
 
 /**
@@ -99,14 +99,14 @@ print_r($updatedProject);
  */
 
 $deleteResponse = $Projects->delete($updatedProject);
-echo "\e[32mGot this as a result for the delete Request: \e[0m".PHP_EOL;
+\Productsup\Utils\CommandLine::infoText('Got this as a result for the delete Request: ');
 var_dump($deleteResponse);
 
 /**
  * if you try to get the deleted object now, you will receive an error:
  */
 try {
-    echo "\e[32mTrying to get a deleted project: \e[0m".PHP_EOL;
+    \Productsup\Utils\CommandLine::infoText('Trying to get a deleted project: ');
     $Projects->get($updatedProject->id);
 } catch(\Productsup\Exceptions\ClientException $e) {
     echo $e->getCode().' '.$e->getMessage().PHP_EOL;

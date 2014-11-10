@@ -1,18 +1,16 @@
 <?php
 
 namespace Productsup\Service;
-use Productsup\Platform\Project as PlatformProject;
-use Productsup\Platform\Site as PlatformSite;
+use Productsup\Platform\Project;
 use Productsup\Exceptions;
 use Productsup\Platform\Site;
 
 class Sites extends Service {
 
-    private $_parentObject;
     protected $serviceName = 'sites';
     protected $parent = 'projects';
 
-    public function setProject(PlatformProject $Project) {
+    public function setProject(Project $Project) {
         $this->_parentObject = $Project;
     }
 
@@ -61,21 +59,4 @@ class Sites extends Service {
     public function update(Site $site) {
         return $this->_update($site);
     }
-
-
-    /**
-     * returns the base url for the api and current resource
-     * @return string
-     */
-    protected function getBaseUrl() {
-        $url = $this->scheme.'://'.$this->host.'/'.$this->api.'/'.$this->version.'/';
-
-        if($this->_parentObject) {
-            $url .= $this->parent.'/'.$this->_parentObject->id.'/';
-        }
-        $url .= $this->serviceName;
-        return $url;
-    }
-
-
 }

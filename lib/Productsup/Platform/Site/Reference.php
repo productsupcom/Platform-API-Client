@@ -34,9 +34,6 @@ class Reference
      */
     public function setKey($key)
     {
-        if (!preg_match('/^[a-z0-9_\-]+$/', $key)) {
-            throw new Exception(Exception::E_INVALID_REFERENCE_KEY, $key);
-        }
         $this->_key = $key;
     }
 
