@@ -31,8 +31,15 @@ foreach($SiteList as $siteObj) {
 }
 
 
+/**
+ * to get a certain site you may pass a reference,
+ * how references are created is explained later
+ */
+$reference = new \Productsup\Platform\Site\Reference();
+$reference->setKey('MyTestReference');
+$reference->setValue('1234');
 
-$SiteList = $Sites->get(252666);
+$SiteList = $Sites->get($reference);
 echo 'Get one site by its id: '.PHP_EOL;
 print_r($SiteList);
 
@@ -62,17 +69,33 @@ print_r($SiteList);
  * you can also create a new one:
  */
 
+// creating the project
 $projectObject = new \Productsup\Platform\Project();
 $projectObject->name = 'example project '.date('Y-m-d H:i:s');
 $Projects = new \Productsup\Service\Projects($Client);
 $newProject = $Projects->insert($projectObject);
 
+// create the service and reference the project
 $SitesService = new \Productsup\Service\Sites($Client);
 $SitesService->setProject($newProject);
 
 $siteObject = new \Productsup\Platform\Site();
 $siteObject->title = 'new example site';
 
+/**
+ * if you want to reference the project from now on with your identifier,
+ * you can create a reference while inserting:
+ *
+ * note: references have to be unique,
+ * if you try to add a reference that already exists you will receive an conflict exception
+ */
+$reference = new \Productsup\Platform\Site\Reference();
+$reference->setKey('MyTestReference');
+$reference->setValue(uniqid());
+$siteObject->addReference($reference);
+
+
+// perform the actual insert
 $newSite = $SitesService->insert($siteObject);
 echo 'new inserted site:'.PHP_EOL;
 print_r($newSite);
@@ -92,8 +115,3 @@ print_r($updatedSite);
 $result = $SitesService->delete($updatedSite);
 echo 'result of deleting one site:'.PHP_EOL;
 var_dump($result);
-
-
-/**
- * you can also use tags, to identify your site, please see Tags.php for examples on how to use tags
- */
