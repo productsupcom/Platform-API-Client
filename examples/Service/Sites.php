@@ -25,7 +25,7 @@ $Sites = new Productsup\Service\Sites($Client);
  * getting all sites:
  */
 $SiteList = $Sites->get();
-\Productsup\Utils\CommandLine::infoText('Get all your sites: ');
+echo 'Get all your sites: '.PHP_EOL;
 foreach($SiteList as $siteObj) {
     echo $siteObj->id.' '.$siteObj->domain.PHP_EOL;
 }
@@ -33,10 +33,10 @@ foreach($SiteList as $siteObj) {
 
 
 $SiteList = $Sites->get(252666);
-\Productsup\Utils\CommandLine::infoText('Get one site by its id: ');
+echo 'Get one site by its id: '.PHP_EOL;
 print_r($SiteList);
 
-\Productsup\Utils\CommandLine::infoText('Getting a site that does not exist results in an ClientException: ');
+echo 'Getting a site that does not exist results in an ClientException: '.PHP_EOL;
 
 try {
     $SiteList = $Sites->get(-1);
@@ -53,7 +53,7 @@ $Project->id = 9659;
 
 $Sites->setProject($Project);
 $SiteList = $Sites->get();
-\Productsup\Utils\CommandLine::infoText('Getting a site list for a certain project');
+echo 'Getting a site list for a certain project'.PHP_EOL;
 print_r($SiteList);
 
 
@@ -74,7 +74,7 @@ $siteObject = new \Productsup\Platform\Site();
 $siteObject->domain = 'new example site';
 
 $newSite = $SitesService->insert($siteObject);
-\Productsup\Utils\CommandLine::infoText('new inserted site:');
+echo 'new inserted site:'.PHP_EOL;
 print_r($newSite);
 
 /**
@@ -82,14 +82,14 @@ print_r($newSite);
  */
 $newSite->domain = 'updated site name';
 $updatedSite = $SitesService->update($newSite);
-\Productsup\Utils\CommandLine::infoText('updated site:');
+echo 'updated site:'.PHP_EOL;
 print_r($updatedSite);
 
 /**
  * you can also delete sites:
  */
 $result = $SitesService->delete($updatedSite);
-\Productsup\Utils\CommandLine::infoText('result of deleting one site:');
+echo 'result of deleting one site:'.PHP_EOL;
 var_dump($result);
 
 

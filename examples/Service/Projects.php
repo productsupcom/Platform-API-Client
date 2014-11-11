@@ -55,7 +55,7 @@ try {
  * Get list of projects in your account
  */
 $projects = $Projects->get();
-\Productsup\Utils\CommandLine::infoText('all projects belonging to the identified client: ');
+echo 'all projects belonging to the identified client: '.PHP_EOL;
 foreach ($projects as $Project) {
     echo sprintf('%s: %s', $Project->id, $Project->name).PHP_EOL;
 }
@@ -69,19 +69,19 @@ $Project = new Productsup\Platform\Project();
 $Project->name = "Testproject ".uniqid();
 
 $NewProject = $Projects->insert($Project);
-\Productsup\Utils\CommandLine::infoText('inserted a new project, and got as result: ');
+echo 'inserted a new project, and got as result: '.PHP_EOL;
 print_r($NewProject);
 
 $insertedId = $NewProject->id; // remembering the id, so we can use it for other operations
 
-\Productsup\Utils\CommandLine::infoText('id of the new project: ');
+echo 'id of the new project: '.PHP_EOL;
 print_r($insertedId);
 echo PHP_EOL;
 /**
  * get one project, identified by its id:
  */
 $getResonse = $Projects->get($insertedId);
-\Productsup\Utils\CommandLine::infoText('Got this as a result for the get Request: ');
+echo 'Got this as a result for the get Request: '.PHP_EOL;
 print_r($getResonse);
 
 /**
@@ -91,7 +91,7 @@ $receivedProject = $getResonse[0];
 $receivedProject->name = 'updated projectname';
 
 $updatedProject = $Projects->update($receivedProject);
-\Productsup\Utils\CommandLine::infoText('Got this as a result for the update Request: ');
+echo 'Got this as a result for the update Request: '.PHP_EOL;
 print_r($updatedProject);
 
 /**
@@ -99,14 +99,14 @@ print_r($updatedProject);
  */
 
 $deleteResponse = $Projects->delete($updatedProject);
-\Productsup\Utils\CommandLine::infoText('Got this as a result for the delete Request: ');
+echo 'Got this as a result for the delete Request: '.PHP_EOL;
 var_dump($deleteResponse);
 
 /**
  * if you try to get the deleted object now, you will receive an error:
  */
 try {
-    \Productsup\Utils\CommandLine::infoText('Trying to get a deleted project: ');
+    echo 'Trying to get a deleted project: '.PHP_EOL;
     $Projects->get($updatedProject->id);
 } catch(\Productsup\Exceptions\ClientException $e) {
     echo $e->getCode().' '.$e->getMessage().PHP_EOL;

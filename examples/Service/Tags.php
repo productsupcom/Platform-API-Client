@@ -1,18 +1,15 @@
 <?php
-    
+
 include __DIR__.'/../../autoload.php';
 
 /**
  * Authentication
  *
- * You'll get the client id and secret at the plaform (API Access) 
+ * You'll get the client id and secret at the plaform (API Access)
  **/
 $Client = new Productsup\Client();
 $Client->id = 1234;
 $Client->secret = 'simsalabim';
-
-
-
 
 
 /**
@@ -54,7 +51,7 @@ $tagService->setSite($site);
 // $tag->site_id = $site->id;
 
 $tag = $tagService->insert($tag);
-\Productsup\Utils\CommandLine::infoText('your new inserted tag:');
+echo 'your new inserted tag:'.PHP_EOL;
 print_r($tag);
 
 /**
@@ -70,7 +67,7 @@ $tag->value = '321';
 $sitesService = new \Productsup\Service\Sites($Client);
 $sites = $sitesService->get($tag);
 
-\Productsup\Utils\CommandLine::infoText('result for getting a site via its tag:');
+echo 'result for getting a site via its tag:'.PHP_EOL;
 print_r($sites);
 
 /**
@@ -81,7 +78,7 @@ $tagService = new \Productsup\Service\Tags($Client);
 $tagService->setSite($sites[0]);
 $tags = $tagService->get();
 
-\Productsup\Utils\CommandLine::infoText('tags assigned to the test-site:');
+echo 'tags assigned to the test-site:'.PHP_EOL;
 print_r($tags);
 
 /**
@@ -91,7 +88,7 @@ $tagService = new \Productsup\Service\Tags($Client);
 $tags[0]->value = '123';
 $updatedTag = $tagService->update($tags[0]);
 
-\Productsup\Utils\CommandLine::infoText('the updated tag looks like this:');
+echo 'the updated tag looks like this:'.PHP_EOL;
 print_r($updatedTag);
 
 /**
@@ -106,7 +103,7 @@ $tagService->update($updatedTag);
  * if you try to update it now this will result in an exception:
  */
 try {
-    \Productsup\Utils\CommandLine::infoText('if you try to update a readonly tag:');
+    echo 'if you try to update a readonly tag:'.PHP_EOL;
     $updatedTag->value = 'updated321';
     $result = $tagService->update($updatedTag);
     print_r($result);
@@ -128,10 +125,10 @@ $insertedTag = $tagService->insert($newTag);
 
 $result = $tagService->delete($insertedTag);
 
-\Productsup\Utils\CommandLine::infoText('result from deleting a tag:');
+echo 'result from deleting a tag:'.PHP_EOL;
 var_dump($result);
 
-\Productsup\Utils\CommandLine::infoText('trying to get a site from a deleted tag:');
+echo 'trying to get a site from a deleted tag:'.PHP_EOL;
 $siteService = new \Productsup\Service\Sites($Client);
 try {
     $result = $sitesService->get($insertedTag->id);
