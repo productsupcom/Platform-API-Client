@@ -27,7 +27,7 @@ $Sites = new Productsup\Service\Sites($Client);
 $SiteList = $Sites->get();
 echo 'Get all your sites: '.PHP_EOL;
 foreach($SiteList as $siteObj) {
-    echo $siteObj->id.' '.$siteObj->domain.PHP_EOL;
+    echo $siteObj->id.' '.$siteObj->title.PHP_EOL;
 }
 
 
@@ -71,16 +71,17 @@ $SitesService = new \Productsup\Service\Sites($Client);
 $SitesService->setProject($newProject);
 
 $siteObject = new \Productsup\Platform\Site();
-$siteObject->domain = 'new example site';
+$siteObject->title = 'new example site';
 
 $newSite = $SitesService->insert($siteObject);
 echo 'new inserted site:'.PHP_EOL;
 print_r($newSite);
 
+
 /**
  * to update the site entry, you can send the edited site object
  */
-$newSite->domain = 'updated site name';
+$newSite->title = 'updated site name';
 $updatedSite = $SitesService->update($newSite);
 echo 'updated site:'.PHP_EOL;
 print_r($updatedSite);
