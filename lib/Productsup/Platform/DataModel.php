@@ -3,8 +3,11 @@
  * Parent for all data models, with abstraction for mutually used functions
  */
 namespace Productsup\Platform;
+
 class DataModel {
     public $id;
+
+    protected $reference;
     /**
      * @param null|array $data data to initialise
      */
@@ -38,6 +41,9 @@ class DataModel {
         foreach($this->getPublicProperties() as $property) {
             $result[$property] = $this->$property;
         }
+        if($this->reference) {
+            $result['reference'] = (string)$this->reference;
+        }
         return $result;
     }
 
@@ -53,4 +59,4 @@ class DataModel {
         }
         return $result;
     }
-} 
+}
