@@ -1,14 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: chris
- * Date: 07.11.14
- * Time: 09:41
+ * Parent for all data models, with abstraction for mutually used functions
  */
-
 namespace Productsup\Platform;
-
-
 class DataModel {
     public $id;
     /**
