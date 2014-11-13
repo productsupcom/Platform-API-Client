@@ -174,7 +174,7 @@ class ProductData extends Service {
      * @return array data provided in response
      */
     private function submitInsert() {
-        $this->_submit('add',$this->_insert);
+        $this->_submit('insert',$this->_insert);
     }
 
     /**
@@ -206,7 +206,7 @@ class ProductData extends Service {
         $data = $response->getData();
         foreach($data as $key => $val) {
             if($key == 'success') continue; // we know it was a success, otherwise it would have failed before
-            $this->_submitLog[] = date('Y-m-d H:i:s').' did  '.$key.' '.$val['count'].' products for batch '.$this->_batchId;
+            $this->_submitLog[] = date('Y-m-d H:i:s').' added '.$val['count'].' product(s) '.' for '.$key.' to batch '.$this->_batchId;
         }
     }
 
