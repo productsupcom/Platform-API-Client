@@ -14,7 +14,7 @@ class Tags extends Service
      * @param Site $site
      */
     public function setSite(Site $site) {
-        $this->_parentObject = $site;
+        $this->_parentIdentifier = $site->id;
     }
 
     /**

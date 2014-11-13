@@ -20,6 +20,9 @@ class Reference
         if(!$this->_value) {
             throw new ClientException('the value for your reference is missing');
         }
+        if($this->_key == self::REFERENCE_SITE) {
+            return (string)$this->_value;
+        }
         return $this->_key.':'.$this->_value;
     }    
 
@@ -39,7 +42,7 @@ class Reference
 
 
     private function isValid($str) {
-        return preg_match('/^[a-zA-Z0-9]+$/',$str);
+        return preg_match('/^[a-zA-Z0-9-_]+$/',$str);
     }
 
     /**

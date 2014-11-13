@@ -1,14 +1,12 @@
 <?php
 
 namespace Productsup\IO;
+use Productsup\Exceptions\ServerException;
 use Productsup\Http\Request as Request;
 use Productsup\Http\Response as Response;
 
 class Curl {
-
-
     private $curl;
-
 
     public function __construct() {
         $this->curl = curl_init();
@@ -30,14 +28,16 @@ class Curl {
     }
 
 
-
     /**
      * @param Request $Request
+     * @throws ServerException
      * @return Response
      */
     public function executeRequest(Request $Request) {
         $this->prepareRequest($Request);
-        $curl_response = curl_exec($this->curl);
+        if(!$curl_response = curl_exec($this->curl)) {
+            throw new ServerException(curl_error($this->curl),curl_errno($this->curl));
+        }
 
         list($responseHeaders, $responseBody) = $this->parseHttpResponse($curl_response);
         $statusCode = curl_getinfo($this->curl, CURLINFO_HTTP_CODE);

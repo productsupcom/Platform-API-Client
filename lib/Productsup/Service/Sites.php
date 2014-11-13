@@ -11,7 +11,7 @@ class Sites extends Service {
     protected $parent = 'projects';
 
     public function setProject(Project $Project) {
-        $this->_parentObject = $Project;
+        $this->_parentIdentifier = $Project->id;
     }
 
     /**

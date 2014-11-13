@@ -30,8 +30,10 @@ abstract class Service
     /** @var string service name of the parent (e.g. "projects" for "sites") */
     protected $parent;
 
-    /** @var  mixed|DataModel the parent object referring to the current service (e.g. DataModel\Project for sites) */
-    protected $_parentObject;
+    /** @var  string identifier for the parent object referring to the current service
+     * e.g. a $site->id or string representation of a Reference object
+     */
+    protected $_parentIdentifier;
 
     protected $_postLimit = 5000;
 
@@ -68,6 +70,7 @@ abstract class Service
     /**
      * deletes the resources identified by given id
      * @param $id
+     * @throws \Productsup\Exceptions\ClientException
      * @return bool true on success
      */
     protected function _delete($id) {
@@ -113,23 +116,6 @@ abstract class Service
     /** @return DataModel */
     protected abstract function getDataModel();
 
-
-    public function setPostLimit($limit)
-    {
-        if ($limit < 1) {
-            throw new Exception('Post limit lower 1 not allowed');
-        } elseif ($limit > 10000) {
-            throw new Exception('Post limit higher 10.000 not allowed');
-        }
-
-        $this->_postLimit = $limit;
-    }
-
-    public function getPostLimit()
-    {
-        return $this->_postLimit;
-    }
-
     /**
      * @return Client
      */
@@ -144,22 +130,37 @@ abstract class Service
      */
     protected function getRequest() {
         $request = new Request($this->getClient());
-        $request->url = $this->getBaseUrl();
+        $request->url = $this->getUrl();
         return $request;
     }
 
     /**
-     * returns the base url for the api and current resource
+     * returns the base url for the api
      * @return string
      */
     protected function getBaseUrl() {
-        $url = $this->scheme.'://'.$this->host.'/'.$this->api.'/'.$this->version.'/';
+        return $this->scheme.'://'.$this->host.'/'.$this->api.'/'.$this->version.'/';
+    }
 
-        if($this->parent && $this->_parentObject) {
-            $url .= $this->parent.'/'.$this->_parentObject->id.'/';
+    /**
+     * returns the part of the url referencing to the current service
+     * @return string
+     */
+    protected function getServiceUrl() {
+        $url = '';
+        if($this->parent && $this->_parentIdentifier) {
+            $url .= $this->parent.'/'.$this->_parentIdentifier.'/';
         }
         $url .= $this->serviceName;
         return $url;
+    }
+
+    /**
+     * returns the full url to the api endpoint of the current service
+     * @return string
+     */
+    protected function getUrl() {
+        return $this->getBaseUrl().$this->getServiceUrl();
     }
 
 

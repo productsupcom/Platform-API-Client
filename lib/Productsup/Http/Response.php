@@ -43,7 +43,13 @@ class Response {
             $message = isset($data['message']) ? $data['message'] : 'internal server error';
             throw new Exceptions\ServerException($message,$this->_httpStatus);
         } elseif($this->_httpStatus >= 400) {
-            $message = isset($data['message']) ? $data['message'] : 'client error';
+            if(isset($data['message'])) {
+                $message = $data['message'];
+            } elseif($this->_httpStatus == 404) {
+                $message = 'resource not found'; // no message, but 404 probably means the server doesn't know the route
+            } else {
+                $message = 'client error';
+            }
             throw new Exceptions\ClientException($message,$this->_httpStatus);
         } elseif(!isset($data['success']) || !$data['success']) {
             $message = isset($data['message']) ? $data['message'] : 'invalid response format';
