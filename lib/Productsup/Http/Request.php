@@ -48,7 +48,12 @@ class Request
     }
 
     protected function encodeData() {
-        return json_encode($this->postBody);
+        $encoded = json_encode($this->postBody);
+        if(function_exists('gzdeflate')) {
+            $encoded = gzdeflate($encoded, 9);
+            $this->setHeader('Content-Encoding','gzip');
+        }
+        return $encoded;
     }
 
     public function setHeader($name, $value) {
@@ -59,6 +64,7 @@ class Request
     public function getHeaders() {
         if($this->hasData()) {
             $this->setHeader('Content-Type','application/json');
+
         }
 
         $headers = array();
