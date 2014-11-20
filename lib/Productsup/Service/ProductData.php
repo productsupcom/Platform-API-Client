@@ -19,10 +19,20 @@ class ProductData extends Service {
     /** @var bool is the current batch finished?*/
     private $finished = false;
 
+    /** @var string what kind of import is this? see constants for further information */
+    private $importType = self::TYPE_FULL;
+
+    /** a full import, this upload replaces all earlier uploads for the referenced site, once it is completed */
+    const TYPE_FULL = 'full';
+    /** a delta import, this is a incremental update to the last full import of the referenced site */
+    const TYPE_DELTA = 'delta';
+
+
     /** @var string  */
     protected $parent = 'sites';
     /** @var string  */
     protected $serviceName = 'products';
+
 
 
     /**
@@ -79,6 +89,14 @@ class ProductData extends Service {
         $this->_parentIdentifier = (string)$reference;
     }
 
+    public function setImportType($type) {
+        if($type !== self::TYPE_FULL && $type !== self::TYPE_DELTA) {
+            throw new Exceptions\ClientException('unsupported import type, use one of the type constants');
+        }
+        $this->importType = $type;
+    }
+
+
     /**
      * send products to the api that were not sent yet,
      * and tells the api that the current batch is complete and may get processed
@@ -88,6 +106,9 @@ class ProductData extends Service {
         $this->checkSubmit(0); // send all unsent products
         $request = $this->getRequest();
         $request->method = Request::METHOD_POST;
+        $request->postBody = array(
+            'type' => $this->importType
+        );
         $request->url .= '/commit';
         $response = $this->getIoHandler()->executeRequest($request);
         $this->finished = true;
@@ -191,7 +212,6 @@ class ProductData extends Service {
         $request->method = Request::METHOD_POST;
         $request->url .= '/'.$type;
         $request->postBody = $data;
-
         $response = $this->getIoHandler()->executeRequest($request);
         $data = array();
         $this->logResponse($response);

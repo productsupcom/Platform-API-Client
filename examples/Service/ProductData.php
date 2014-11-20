@@ -22,18 +22,35 @@ $ProductService->setPostLimit(1000);
 $Reference = new Productsup\Platform\Site\Reference();
 
 /**
- * In case you have a productsup site id 
+ * You have to specify the site the products belong to.
+ * This is done by references to the site.
+ *
+ * In case you have a productsup site id, you can pass it like this:
  **/
 $Reference->setKey($Reference::REFERENCE_SITE);
 $Reference->setValue(397); // Site ID
 
 /**
- * In case you want to use your own reference
+ * In case you want to use your own reference:
  **/
 //$Reference->setKey('merchant_id'); // A site tag
 //$Reference->setValue(1234); // Value of the tag
 
 $ProductService->setReference($Reference);
+
+
+/**
+ * you may specify which type of import you plan to send:
+ *
+ * a full import replaces all existing products (default, if not specified)
+ * a delta import is used to update the latest full import
+ *
+ * note: one import/service has only one type
+ */
+//$ProductService->setImportType(\Productsup\Service\ProductData::TYPE_FULL);
+$ProductService->setImportType(\Productsup\Service\ProductData::TYPE_DELTA);
+
+
 
 /** 
  * Adding one product to insert.
