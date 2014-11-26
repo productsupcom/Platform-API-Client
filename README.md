@@ -24,5 +24,5 @@ require_once(__DIR__.'/Platform-API-Client/autoload.php');
  * [PHP cURL](http://php.net/manual/en/curl.installation.php)
  
 # Basic usage
-see [/examples/Service/Projects.php](https://github.com/productsupcom/Platform-API-Client/blob/master/examples/Service/Projects.php) for example usage.
+see the [example scripts](https://github.com/productsupcom/Platform-API-Client/tree/master/examples/Service).
 
