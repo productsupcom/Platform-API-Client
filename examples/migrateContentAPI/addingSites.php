@@ -52,6 +52,7 @@ $exportService = new \Productsup\Service\Exports($client);
  * adding a reference to the site you want to export:
  * for more information on how references in services work, @see /examples/Service/ProductData.php
  */
+$Reference = new \Productsup\Platform\Site\Reference();
 $Reference->setKey('MyTestReference');
 $Reference->setValue('TestId');
 $exportService->setReference($Reference);
