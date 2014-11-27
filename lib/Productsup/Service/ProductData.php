@@ -8,10 +8,8 @@ use Productsup\Exceptions;
 use Productsup\Platform\Site\Reference;
 
 class ProductData extends Service {
-    /** @var array stores products to add */
-    private $_insert = array();
-    /** @var array stores products to delete */
-    private $_delete = array();
+    /** @var array stores products to add or delete*/
+    private $_productData = array();
     /** @var string identifier of the current batch */
     private $_batchId;
     /** @var array logs os all submits */
@@ -26,6 +24,9 @@ class ProductData extends Service {
     const TYPE_FULL = 'full';
     /** a delta import, this is a incremental update to the last full import of the referenced site */
     const TYPE_DELTA = 'delta';
+
+    /** @var string this name is reserved to mark products as delete */
+    private $deleteFlagName = 'pup:isDelete';
 
 
     /** @var string  */
@@ -61,7 +62,7 @@ class ProductData extends Service {
      * @throws \Productsup\Exceptions\ClientException
      */
     public function insert(array $product) {
-        $this->addRow($this->_insert,$product);
+        $this->addRow($product,false);
     }
 
     /**
@@ -74,7 +75,7 @@ class ProductData extends Service {
      * @throws \Productsup\Exceptions\ClientException
      */
     public function delete(array $product) {
-        $this->addRow($this->_delete,$product);
+        $this->addRow($product, true);
     }
 
     /**
@@ -144,18 +145,28 @@ class ProductData extends Service {
     }
 
     /**
-     * @param $data
-     * @param $row
-     * @throws \Productsup\Exceptions\ClientException
+     * @param $row array of the actual data
+     * @param $isDelete bool flag if this product is a delete or insert
+     * @throws Exceptions\ClientException
      */
-    private function addRow(&$data,$row) {
+    private function addRow($row,$isDelete) {
         if($this->isArrayMultiDimensional($row)) {
             throw new Exceptions\ClientException('please pass only one product/row at once, rows are not allowed to contain arrays');
         }
         if($this->finished) {
             throw new Exceptions\ClientException('the current batch is already finished, please create a new one');
         }
-        $data[] = $row;
+        if(array_key_exists($this->deleteFlagName,$row)) {
+            throw new Exceptions\ClientException('"'.$this->deleteFlagName.'" is a reserved name to flag deleted products, please use another name');
+        }
+        if(!array_key_exists('id',$row)) {
+            throw new Exceptions\ClientException('adding one column "id" to the product data is mandatory');
+        }
+
+        if($isDelete) {
+            $row[$this->deleteFlagName] = 1;
+        }
+        $this->_productData[] = $row;
         $this->checkSubmit($this->getPostLimit());
     }
 
@@ -164,11 +175,8 @@ class ProductData extends Service {
      * @var int $limit maximum rows
      */
     private function checkSubmit($limit) {
-        if (count($this->_insert) >= $limit) {
-            $this->submitInsert();
-        }
-        if(count($this->_delete) >= $limit) {
-            $this->submitDelete();
+        if (count($this->_productData) >= $limit) {
+            $this->_submit();
         }
     }
 
@@ -183,37 +191,19 @@ class ProductData extends Service {
     }
 
     /**
-     * submits products to delete to the api
-     * @return array data provided in response
-     */
-    private function submitDelete() {
-        $this->_submit('delete',$this->_delete);
-    }
-
-    /**
-     * submits products to insert to the api
-     * @return array data provided in response
-     */
-    private function submitInsert() {
-        $this->_submit('insert',$this->_insert);
-    }
-
-    /**
      * submits products to the api
-     * @param $type
-     * @param $data
-     * @return array
+     * @return array response of the api
      */
-    private function _submit($type, &$data) {
-        if(count($data) == 0) { // no data, do not send request
+    private function _submit() {
+        if(count($this->_productData) == 0) { // no data, do not send request
             return array();
         }
         $request = $this->getRequest();
         $request->method = Request::METHOD_POST;
-        $request->url .= '/'.$type;
-        $request->postBody = $data;
+        $request->url .= '/upload';
+        $request->postBody = $this->_productData;
         $response = $this->getIoHandler()->executeRequest($request);
-        $data = array();
+        $this->_productData = array();
         $this->logResponse($response);
         return $response->getData();
     }
