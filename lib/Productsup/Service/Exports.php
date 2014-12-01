@@ -85,7 +85,7 @@ class Exports extends Service {
      */
     public function enableContentApi($merchantCenterId, $merchantCenterParentId, $targetLanguage, $targetCountry) {
         $export = $this->getDataModel();
-        $export->export_id = 1;
+        $export->export_id = 3337;
         $export = $this->insert($export);
 
         $destinationService = new Destinations($this->_Client);
