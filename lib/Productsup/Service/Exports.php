@@ -16,6 +16,8 @@ class Exports extends Service {
     protected $serviceName = 'exports';
     protected $parent = 'sites';
 
+    const GOOGLE_MERCHANT_CENTER = 3337;
+
     public function setSite(Site $site) {
         $this->_parentIdentifier = $site->id;
     }
