@@ -7,6 +7,8 @@ use Productsup\Http\Response as Response;
 
 class Curl {
     private $curl;
+    public $debug = 0;
+    public $verbose = 0;
 
     public function __construct() {
         $this->curl = curl_init();
@@ -22,6 +24,9 @@ class Curl {
         }
 
         curl_setopt($this->curl, CURLOPT_HTTPHEADER, $request->getHeaders());
+        if($this->debug) {
+            $request->url .= '?debug=1';
+        }
         curl_setopt($this->curl, CURLOPT_URL, $request->url);
         curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, $request->method);
         curl_setopt($this->curl, CURLOPT_USERAGENT, $request->getUserAgent());
@@ -34,6 +39,9 @@ class Curl {
      * @return Response
      */
     public function executeRequest(Request $Request) {
+        if($this->verbose) {
+            $Request->verboseOutput();
+        }
         $this->prepareRequest($Request);
         if(!$curl_response = curl_exec($this->curl)) {
             throw new ServerException(curl_error($this->curl),curl_errno($this->curl));
@@ -41,7 +49,11 @@ class Curl {
 
         list($responseHeaders, $responseBody) = $this->parseHttpResponse($curl_response);
         $statusCode = curl_getinfo($this->curl, CURLINFO_HTTP_CODE);
-        return new Response($statusCode,$responseHeaders,$responseBody);
+        $responseObject = new Response($statusCode,$responseHeaders,$responseBody);
+        if($this->verbose) {
+            $responseObject->verboseOutput();
+        }
+        return $responseObject;
     }
 
 

@@ -76,5 +76,9 @@ class Request
         return $headers;
     }
 
+    public function verboseOutput() {
+        echo "Request:\n\n".$this->method.": ".$this->url." \nHeaders:".join("\n",$this->getHeaders())."\nBody:".$this->getBody();
+    }
+
 
 }

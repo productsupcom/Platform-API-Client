@@ -9,15 +9,18 @@ class Response {
     private $_body;
     private $_data;
 
+    private $_request;
+
     /**
      * @param $statusCode
      * @param $headers
      * @param $body
      */
-    public function __construct($statusCode, $headers,$body) {
+    public function __construct($statusCode, $headers,$body, $request = null) {
         $this->_httpStatus = $statusCode;
         $this->_headers = $headers;
         $this->_body = $body;
+        $this->_request = $request;
         $this->errorHandling();
     }
 
@@ -30,6 +33,10 @@ class Response {
             $this->_data = $this->decodeJson();
         }
         return $this->_data;
+    }
+
+    public function verboseOutput() {
+        echo "\nOutput:\nHeaders:\n".$this->_headers."\n\nBody:\n".$this->_body;
     }
 
     /**
@@ -48,7 +55,7 @@ class Response {
             } elseif($this->_httpStatus == 404) {
                 $message = 'resource not found'; // no message, but 404 probably means the server doesn't know the route
             } else {
-                $message = 'client error';
+                $message = 'client error '.$this->_httpStatus;
             }
             throw new Exceptions\ClientException($message,$this->_httpStatus);
         } elseif(!isset($data['success']) || !$data['success']) {

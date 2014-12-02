@@ -37,12 +37,25 @@ abstract class Service
 
     protected $_postLimit = 5000;
 
+    protected $verbose = false;
+    protected $debug = false;
+
 
     /**
      * @param Client $Client
      */
     public function __construct(Client $Client) {
         $this->_Client = $Client;
+        // just for debugging, allow to pass params to trigger verbose and debug mode
+        if(isset($_SERVER['argv']) && count($_SERVER['argv'])) {
+            unset($_SERVER['argv'][0]);
+            if(in_array('v',$_SERVER['argv'])) {
+                $this->verbose = true;
+            }
+            if(in_array('d',$_SERVER['argv'])) {
+                $this->debug = true;
+            }
+        }
     }
 
     /**
@@ -169,7 +182,14 @@ abstract class Service
      * @return Curl
      */
     protected function getIoHandler() {
-        return new Curl();
+        $io = new Curl();
+        if($this->verbose) {
+            $io->verbose = true;
+        }
+        if($this->debug) {
+            $io->debug = true;
+        }
+        return $io;
     }
 
     /**
