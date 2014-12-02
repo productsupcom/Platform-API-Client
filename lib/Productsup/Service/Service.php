@@ -10,7 +10,7 @@ use Productsup\Platform\DataModel;
 abstract class Service
 {
     /** @var string Hostname */
-    protected $host = 'api.productsup.io';
+    protected $host = 'api.productsup.com';
 
     /** @var string Scheme */
     protected $scheme = 'http';
