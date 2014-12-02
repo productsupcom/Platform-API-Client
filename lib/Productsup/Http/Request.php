@@ -35,10 +35,10 @@ class Request
         return 'Productsup API Client (PHP)';
     }
 
-    public function getBody() {
+    public function getBody($allowCompression = true) {
         $body = null;
         if($this->hasData()) {
-            return $this->encodeData();
+            return $this->encodeData($allowCompression);
         }
         return $body;
     }
@@ -47,9 +47,9 @@ class Request
         return $this->postBody && is_array($this->postBody);
     }
 
-    protected function encodeData() {
+    protected function encodeData($allowCompression = true) {
         $encoded = json_encode($this->postBody);
-        if(function_exists('gzdeflate')) {
+        if($allowCompression && function_exists('gzdeflate')) {
             $encoded = gzdeflate($encoded, 9);
             $this->setHeader('Content-Encoding','gzip');
         }
@@ -77,7 +77,7 @@ class Request
     }
 
     public function verboseOutput() {
-        echo "Request:\n\n".$this->method.": ".$this->url." \nHeaders:".join("\n",$this->getHeaders())."\nBody:".$this->getBody();
+        echo "Request:\n\n".$this->method.": ".$this->url." \nHeaders:".join("\n",$this->getHeaders())."\nBody:".$this->getBody(false);
     }
 
 
