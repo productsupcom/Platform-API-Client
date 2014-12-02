@@ -22,8 +22,9 @@ class Request
      */
     public function __construct(Client $Client) {
         $this->_Client = $Client;
-        $this->headers['X-Auth-Token'] = $this->_Client->getToken();
-        $this->headers['Accept'] = 'application/json';
+        $this->setHeader('X-Auth-Token',$this->_Client->getToken());
+        $this->setHeader('Accept', 'application/json');
+        $this->setHeader('X-Powered-By',phpversion());
     }
 
     /**
