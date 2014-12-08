@@ -15,13 +15,17 @@ class Response {
      * @param $statusCode
      * @param $headers
      * @param $body
+     * @param string $apiKind
+     * @internal param null $request
      */
-    public function __construct($statusCode, $headers,$body, $request = null) {
+    public function __construct($statusCode, $headers,$body, $apiKind = 'REST') {
         $this->_httpStatus = $statusCode;
         $this->_headers = $headers;
         $this->_body = $body;
-        $this->_request = $request;
-        $this->errorHandling();
+        if($apiKind == 'REST') {
+            $this->restErrorHandling();
+
+        }
     }
 
     /**
@@ -44,10 +48,12 @@ class Response {
      * @throws \Productsup\Exceptions\ServerException
      * @throws \Productsup\Exceptions\ClientException
      */
-    private function errorHandling() {
+    private function restErrorHandling() {
         $data = $this->getData();
+
         if($this->_httpStatus >= 500) {
             $message = isset($data['message']) ? $data['message'] : 'internal server error';
+            $this->verboseOutput();
             throw new Exceptions\ServerException($message,$this->_httpStatus);
         } elseif($this->_httpStatus >= 400) {
             if(isset($data['message'])) {
@@ -57,9 +63,11 @@ class Response {
             } else {
                 $message = 'client error '.$this->_httpStatus;
             }
+            $this->verboseOutput();
             throw new Exceptions\ClientException($message,$this->_httpStatus);
         } elseif(!isset($data['success']) || !$data['success']) {
             $message = isset($data['message']) ? $data['message'] : 'invalid response format';
+            $this->verboseOutput();
             throw new Exceptions\ServerException($message);
         }
     }

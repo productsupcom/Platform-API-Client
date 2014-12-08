@@ -15,14 +15,19 @@ class Request
     public $postBody;
     private $headers = array();
 
+    public $allowCompression = true;
+
     private $_Client;
 
     /**
      * @param \Productsup\Client A client object
+     * @param bool $productsUpAuth
      */
-    public function __construct(Client $Client) {
+    public function __construct(Client $Client,$productsUpAuth = true) {
         $this->_Client = $Client;
-        $this->setHeader('X-Auth-Token',$this->_Client->getToken());
+        if($productsUpAuth) {
+            $this->setHeader('X-Auth-Token',$this->_Client->getToken());
+        }
         $this->setHeader('Accept', 'application/json');
         $this->setHeader('X-Powered-By',phpversion());
     }
@@ -50,7 +55,7 @@ class Request
 
     protected function encodeData($allowCompression = true) {
         $encoded = json_encode($this->postBody);
-        if($allowCompression && function_exists('gzdeflate')) {
+        if($this->allowCompression && $allowCompression && function_exists('gzdeflate')) {
             $encoded = gzdeflate($encoded, 9);
             $this->setHeader('Content-Encoding','gzip');
         }
@@ -80,6 +85,4 @@ class Request
     public function verboseOutput() {
         echo "Request:\n\n".$this->method.": ".$this->url." \nHeaders:".join("\n",$this->getHeaders())."\nBody:".$this->getBody(false);
     }
-
-
 }
