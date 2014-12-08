@@ -38,7 +38,7 @@ class Curl {
      * @throws ServerException
      * @return Response
      */
-    public function executeRequest(Request $Request) {
+    public function executeRequest(Request $Request,$apiKind = 'REST') {
         if($this->verbose) {
             $Request->verboseOutput();
         }
@@ -49,7 +49,7 @@ class Curl {
 
         list($responseHeaders, $responseBody) = $this->parseHttpResponse($curl_response);
         $statusCode = curl_getinfo($this->curl, CURLINFO_HTTP_CODE);
-        $responseObject = new Response($statusCode,$responseHeaders,$responseBody);
+        $responseObject = new Response($statusCode,$responseHeaders,$responseBody,$apiKind);
         if($this->verbose) {
             $responseObject->verboseOutput();
         }
