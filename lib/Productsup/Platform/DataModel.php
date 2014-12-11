@@ -7,6 +7,8 @@ namespace Productsup\Platform;
 class DataModel {
     public $id;
 
+    protected $links;
+
     protected $reference;
     /**
      * @param null|array $data data to initialise
@@ -29,7 +31,18 @@ class DataModel {
                 $this->$key = $value;
             }
         }
+        if(isset($data['links']) && is_array($data['links'])) {
+            foreach($data['links'] as $row) {
+                foreach($row as $type => $val) {
+                    $this->links[$type] = $val;
+                }
+            }
+        }
         return $this;
+    }
+
+    public function getLink($type) {
+        return isset($this->links[$type]) ? $this->links[$type] : null;
     }
 
     /**
