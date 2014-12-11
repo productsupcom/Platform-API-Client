@@ -19,10 +19,6 @@ class Curl {
     }
 
     private function prepareRequest(Request $request) {
-        if($this->verbose) {
-            $request->allowCompression = false; // disable gzip for easier debugging
-        }
-
         if ($request->hasData()) {
             curl_setopt($this->curl, CURLOPT_POSTFIELDS, $request->getBody());
         }
@@ -45,6 +41,7 @@ class Curl {
      */
     public function executeRequest(Request $Request,$apiKind = 'REST') {
         if($this->verbose) {
+            $Request->allowCompression = false; // disable gzip for easier debugging
             $Request->verboseOutput();
         }
         $this->prepareRequest($Request);
