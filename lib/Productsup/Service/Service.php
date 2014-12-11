@@ -108,7 +108,15 @@ abstract class Service
         $request->method = Request::METHOD_POST;
         $request->postBody = $dataModel->toArray();
         $data = $this->executeRequest($request);
-        return $this->getDataModel()->fromArray($data[ucfirst($this->serviceName)][0]);
+        return $this->getDataModel()->fromArray($data[$this->getResultField()][0]);
+    }
+
+    /**
+     * returns the name of the field where the api is expected to return the actual object
+     * @return string
+     */
+    protected function getResultField() {
+        return ucfirst($this->serviceName);
     }
 
     /**
