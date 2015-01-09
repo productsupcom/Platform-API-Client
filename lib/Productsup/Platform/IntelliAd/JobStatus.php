@@ -9,4 +9,5 @@ class JobStatus extends \Productsup\Platform\JobStatus {
     public $channelId;
     public $accountId;
     public $result;
+    public $payload;
 }
