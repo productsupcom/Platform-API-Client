@@ -6,8 +6,8 @@ use Productsup\Http\Request;
 use Productsup\IO\Curl;
 
 class JsonRpcClient {
-    private $uri;
     private $request;
+    public $verbose = false;
     public function __construct($uri) {
         $this->request = new Request(new Client(),false);
         $this->request->url = $uri;
@@ -38,6 +38,8 @@ class JsonRpcClient {
     }
 
     public function getIoHandler() {
-        return new Curl();
+        $io = new Curl();
+        $io->verbose = $this->verbose;
+        return $io;
     }
 }
