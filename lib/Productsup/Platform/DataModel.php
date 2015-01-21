@@ -4,6 +4,8 @@
  */
 namespace Productsup\Platform;
 
+use Productsup\Platform\Site\Reference;
+
 class DataModel {
     public $id;
 
@@ -71,5 +73,14 @@ class DataModel {
             $result[] = $property->getName();
         }
         return $result;
+    }
+
+    /**
+     * adds a reference to a site that can later be used as an identifier
+     * note: this is only possible when creating a site or project
+     * @param Reference $reference
+     */
+    public function addReference(Reference $reference) {
+        $this->reference = $reference;
     }
 }
