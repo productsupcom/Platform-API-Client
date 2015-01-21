@@ -65,7 +65,7 @@ class Response {
             }
             $this->verboseOutput();
             throw new Exceptions\ClientException($message,$this->_httpStatus);
-        } elseif(!isset($data['success']) || !$data['success']) {
+        } elseif(isset($data['success']) && !$data['success']) {
             $message = isset($data['message']) ? $data['message'] : 'invalid response format';
             $this->verboseOutput();
             throw new Exceptions\ServerException($message);
@@ -81,5 +81,12 @@ class Response {
     private function decodeJson() {
         $body = trim($this->_body);
         return json_decode($body, true);
+    }
+
+    /**
+     * @return string
+     */
+    public function getRawBody() {
+        return $this->_body;
     }
 }
