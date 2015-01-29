@@ -10,4 +10,5 @@ class JobStatus extends \Productsup\Platform\JobStatus {
     public $accountId;
     public $result;
     public $payload;
+    public $resultFileUrl;
 }
