@@ -29,7 +29,7 @@ $productsService->setReference($reference);
  */
 $product = array(
     'id' => 1,
-    'additionalImageLinks' => 'http://example.com/img/1.jpg,http://example.com/img/2.jpg',
+    'additionalImageLink' => 'http://example.com/img/1.jpg,http://example.com/img/2.jpg',
     'adult' => 1,
     'adwords_grouping' => '',
     'adwords_labels' => '',
