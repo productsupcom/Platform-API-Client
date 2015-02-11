@@ -59,6 +59,14 @@ abstract class Service
     }
 
     /**
+     * set verbose mode of api for debugging
+     * @param $verbose
+     */
+    public function setVerbose($verbose) {
+        $this->verbose = (bool)$verbose;
+    }
+
+    /**
      * get a list of projects
      * @param null|int $id
      * @throws \Productsup\Exceptions\ServerException
