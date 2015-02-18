@@ -40,7 +40,7 @@ class Response {
     }
 
     public function verboseOutput() {
-        echo "\nOutput:\nHeaders:\n".$this->_headers."\n\nBody:\n".$this->_body;
+        echo "\nOutput:\nHeaders:\n".$this->_headers."\n\nBody:\n".$this->getRawBody();
     }
 
     /**
@@ -53,7 +53,7 @@ class Response {
 
         if($this->_httpStatus >= 500) {
             $message = isset($data['message']) ? $data['message'] : 'internal server error';
-            $this->verboseOutput();
+            //$this->verboseOutput();
             throw new Exceptions\ServerException($message,$this->_httpStatus);
         } elseif($this->_httpStatus >= 400) {
             if(isset($data['message'])) {
@@ -63,11 +63,11 @@ class Response {
             } else {
                 $message = 'client error '.$this->_httpStatus;
             }
-            $this->verboseOutput();
+            //$this->verboseOutput();
             throw new Exceptions\ClientException($message,$this->_httpStatus);
         } elseif(isset($data['success']) && !$data['success']) {
             $message = isset($data['message']) ? $data['message'] : 'invalid response format';
-            $this->verboseOutput();
+            //$this->verboseOutput();
             throw new Exceptions\ServerException($message);
         }
     }
@@ -81,6 +81,13 @@ class Response {
     private function decodeJson() {
         $body = trim($this->_body);
         return json_decode($body, true);
+    }
+
+    public function getHeader($header) {
+        if(preg_match('/'.preg_quote($header).':(.*)/i',$this->_headers,$res)) {
+            return trim($res[1]);
+        }
+        return null;
     }
 
     /**
