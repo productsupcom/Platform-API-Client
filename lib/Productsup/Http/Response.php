@@ -15,7 +15,6 @@ class Response {
      * @param $body
      * @throws Exceptions\ClientException
      * @throws Exceptions\ServerException
-     * @internal param string $apiKind
      */
     public function __construct($statusCode, $headers,$body) {
         $this->_httpStatus = $statusCode;
