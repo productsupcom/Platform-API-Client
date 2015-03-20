@@ -9,23 +9,19 @@ class Response {
     private $_body;
     private $_data;
 
-    private $_request;
-
     /**
      * @param $statusCode
      * @param $headers
      * @param $body
-     * @param string $apiKind
-     * @internal param null $request
+     * @throws Exceptions\ClientException
+     * @throws Exceptions\ServerException
+     * @internal param string $apiKind
      */
-    public function __construct($statusCode, $headers,$body, $apiKind = 'REST') {
+    public function __construct($statusCode, $headers,$body) {
         $this->_httpStatus = $statusCode;
         $this->_headers = $headers;
         $this->_body = $body;
-        if($apiKind == 'REST') {
-            $this->restErrorHandling();
-
-        }
+        $this->restErrorHandling();
     }
 
     /**
@@ -45,8 +41,9 @@ class Response {
 
     /**
      * throws exceptions if the api replied with an error
-     * @throws \Productsup\Exceptions\ServerException
-     * @throws \Productsup\Exceptions\ClientException
+     *
+     * @throws Exceptions\ClientException
+     * @throws Exceptions\ServerException
      */
     private function restErrorHandling() {
         $data = $this->getData();

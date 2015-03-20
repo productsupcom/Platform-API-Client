@@ -35,11 +35,10 @@ class Curl {
 
     /**
      * @param Request $Request
-     * @param string $apiKind
      * @throws \Productsup\Exceptions\ServerException
      * @return Response
      */
-    public function executeRequest(Request $Request,$apiKind = 'REST') {
+    public function executeRequest(Request $Request) {
         if($this->verbose) {
             $Request->allowCompression = false; // disable gzip for easier debugging
             $Request->verboseOutput();
@@ -51,7 +50,7 @@ class Curl {
 
         list($responseHeaders, $responseBody) = $this->parseHttpResponse($curl_response);
         $statusCode = curl_getinfo($this->curl, CURLINFO_HTTP_CODE);
-        $responseObject = new Response($statusCode,$responseHeaders,$responseBody,$apiKind);
+        $responseObject = new Response($statusCode,$responseHeaders,$responseBody);
         if($this->verbose) {
             $responseObject->verboseOutput();
         }
