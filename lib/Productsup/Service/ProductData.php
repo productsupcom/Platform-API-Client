@@ -20,6 +20,9 @@ class ProductData extends Service {
     /** @var string what kind of import is this? see constants for further information */
     private $importType = self::TYPE_FULL;
 
+    /** @var bool mainly for debugging - if true, client does raise exceptions if tried to send discards anyway */
+    private $disableDiscards = false;
+
     /** a full import, this upload replaces all earlier uploads for the referenced site, once it is completed */
     const TYPE_FULL = 'full';
     /** a delta import, this is a incremental update to the last full import of the referenced site */
@@ -35,14 +38,16 @@ class ProductData extends Service {
     protected $serviceName = 'products';
 
 
-
     /**
      * @param Client $Client
+     * @param bool $useShutdownHandler set to false to disable shutdown handler
      */
-    public function __construct(Client $Client) {
+    public function __construct(Client $Client, $useShutdownHandler = true) {
         parent::__construct($Client);
         $this->createBatchId();
-        register_shutdown_function(array($this, 'shutdownHandler'));
+        if($useShutdownHandler) {
+            register_shutdown_function(array($this, 'shutdownHandler'));
+        }
     }
 
     /**
@@ -50,6 +55,10 @@ class ProductData extends Service {
      */
     private function createBatchId() {
         $this->_batchId = md5(microtime().uniqid());
+    }
+
+    public function disableDiscards() {
+        $this->disableDiscards = true;
     }
 
     /**
@@ -119,8 +128,13 @@ class ProductData extends Service {
     /**
      * if you do not want to continue one batch, you can discard it so the files get also removed from the server
      * @return bool
+     * @throws Exceptions\ClientException
+     * @throws Exceptions\ServerException
      */
     public function discard() {
+        if($this->disableDiscards) {
+            throw new Exceptions\ClientException('discards were disabled, but tried to send anyway');
+        }
         $request = $this->getRequest();
         $request->method = Request::METHOD_POST;
         $request->url .= '/discard';
