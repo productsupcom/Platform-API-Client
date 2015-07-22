@@ -73,11 +73,14 @@ abstract class Service
      * @throws \Productsup\Exceptions\ClientException
      * @return \Productsup\Platform\DataModel[]
      */
-    protected function _get($id = null) {
+    protected function _get($id = null, $action = null) {
         $request = $this->getRequest();
         $request->method = Request::METHOD_GET;
         if($id) {
             $request->url .= '/'.$id;
+            if($action) {
+                $request->url .= '/'.$action;
+            }
         }
         $response = $this->getIoHandler()->executeRequest($request);
         $data = $response->getData();

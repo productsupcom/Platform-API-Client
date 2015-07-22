@@ -31,6 +31,9 @@ class ProductData extends Service {
     /** @var string this name is reserved to mark products as delete */
     private $deleteFlagName = 'pup:isDelete';
 
+    /** @var bool was data already submitted? */
+    private $didSubmit = false;
+
 
     /** @var string  */
     protected $parent = 'sites';
@@ -212,6 +215,7 @@ class ProductData extends Service {
         if(count($this->_productData) == 0) { // no data, do not send request
             return array();
         }
+        $this->didSubmit = true;
         $request = $this->getRequest();
         $request->method = Request::METHOD_POST;
         $request->url .= '/upload';
@@ -277,9 +281,48 @@ class ProductData extends Service {
      * discard sent products if they were not handled until the service is unset
      */
     public function shutdownHandler() {
-        if(!$this->finished) {
+        if($this->didSubmit && !$this->finished) {
             $this->discard();
         }
     }
 
+    private function getPdaRequest($stage,$id) {
+        $request = $this->getRequest();
+        $request->method = Request::METHOD_GET;
+        $request->url = $this->scheme.'://'.$this->host.'/product/'.$this->version.'/site/'.$this->_parentIdentifier;
+        $request->url .= '/stage/intermediate/properties/';
+        $request->url .= '/'.$stage;
+        if($id) {
+            $request->url .= '/'.$id;
+        }
+
+        return $request;
+    }
+
+    /**
+     * @param string $stage source|intermediate|channel
+     * @param int|null $id id of the stage (or null for source)
+     * @param array $params
+     * @return array
+     */
+    public function get($stage, $id,array $params) {
+        $this->verbose =1;
+        $this->debug = 1;
+        $request = $this->getPdaRequest($stage,$id);
+
+        $request->url .= '/';
+        $request->queryParams = $params;
+        return $this->executeRequest($request);
+    }
+
+    /**
+     * @param string $stage source|intermediate|channel
+     * @param int|null $id id of the stage (or null for source)
+     * @return array
+     */
+    public function getProperties($stage,$id) {
+        $request = $this->getPdaRequest($stage,$id);
+        $request->url .= '/properties/';
+        return $this->executeRequest($request);
+    }
 }

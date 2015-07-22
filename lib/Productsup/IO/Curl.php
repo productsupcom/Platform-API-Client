@@ -25,7 +25,11 @@ class Curl {
 
         curl_setopt($this->curl, CURLOPT_HTTPHEADER, $request->getHeaders());
         if($this->debug) {
-            $request->url .= '?debug=1';
+            $request->queryParams['debug'] = '1';
+        }
+
+        if(!empty($request->queryParams)) {
+            $request->url .= '?'.http_build_query($request->queryParams);
         }
         curl_setopt($this->curl, CURLOPT_URL, $request->url);
         curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, $request->method);

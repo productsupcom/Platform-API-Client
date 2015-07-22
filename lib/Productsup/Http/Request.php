@@ -15,6 +15,8 @@ class Request
     public $postBody;
     private $headers = array();
 
+    public $queryParams = array();
+
     public $allowCompression = true;
 
     private $_Client;

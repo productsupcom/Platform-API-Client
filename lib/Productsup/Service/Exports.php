@@ -10,6 +10,7 @@ use Productsup\Platform\Site\Reference;
 /**
  * Class Exports
  * exports define where the content of sites get exported to
+ * @deprecated new sites will use Channels instead of Exports
  */
 class Exports extends Service {
 
