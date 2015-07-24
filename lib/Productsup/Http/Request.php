@@ -84,7 +84,15 @@ class Request
         return $headers;
     }
 
+    public function getUrl() {
+        $url = $this->url;
+        if($this->queryParams) {
+            $url .= '?'.http_build_query($this->queryParams);
+        }
+        return $url;
+    }
+
     public function verboseOutput() {
-        echo "Request:\n\n".$this->method.": ".$this->url." \nHeaders:".join("\n",$this->getHeaders())."\nBody:".$this->getBody();
+        echo "Request:\n\n".$this->method.": ".$this->getUrl()." \nHeaders:".join("\n",$this->getHeaders())."\nBody:".$this->getBody();
     }
 }

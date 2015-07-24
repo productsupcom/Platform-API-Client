@@ -41,6 +41,13 @@ class ProductData extends Service {
     protected $serviceName = 'products';
 
 
+
+    /** names for the different stages for querying */
+    const STAGE_IMPORT = 'import';
+    const STAGE_INTERMEDIATE = 'intermediate';
+    const STAGE_EXPORT = 'export';
+    const STAGE_CHANNEL = 'channel';
+
     /**
      * @param Client $Client
      * @param bool $useShutdownHandler set to false to disable shutdown handler
@@ -290,8 +297,7 @@ class ProductData extends Service {
         $request = $this->getRequest();
         $request->method = Request::METHOD_GET;
         $request->url = $this->scheme.'://'.$this->host.'/product/'.$this->version.'/site/'.$this->_parentIdentifier;
-        $request->url .= '/stage/intermediate/properties/';
-        $request->url .= '/'.$stage;
+        $request->url .= '/stage/'.$stage;
         if($id) {
             $request->url .= '/'.$id;
         }
@@ -305,14 +311,13 @@ class ProductData extends Service {
      * @param array $params
      * @return array
      */
-    public function get($stage, $id,array $params) {
-        $this->verbose =1;
-        $this->debug = 1;
+    public function get($stage, $id,$params) {
         $request = $this->getPdaRequest($stage,$id);
 
         $request->url .= '/';
-        $request->queryParams = $params;
-        return $this->executeRequest($request);
+        $request->queryParams = (array)$params;
+        $data = $this->executeRequest($request);
+        return isset($data['products']) ? $data['products'] : array();
     }
 
     /**
@@ -320,9 +325,15 @@ class ProductData extends Service {
      * @param int|null $id id of the stage (or null for source)
      * @return array
      */
-    public function getProperties($stage,$id) {
+    public function getProperties($stage,$id, $params = null) {
         $request = $this->getPdaRequest($stage,$id);
+        if(!$id) {
+            $request->url .= '/0';
+        }
         $request->url .= '/properties/';
+        if($params) {
+            $request->queryParams = (array)$params;
+        }
         return $this->executeRequest($request);
     }
 }

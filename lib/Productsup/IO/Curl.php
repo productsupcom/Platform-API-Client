@@ -28,10 +28,7 @@ class Curl {
             $request->queryParams['debug'] = '1';
         }
 
-        if(!empty($request->queryParams)) {
-            $request->url .= '?'.http_build_query($request->queryParams);
-        }
-        curl_setopt($this->curl, CURLOPT_URL, $request->url);
+        curl_setopt($this->curl, CURLOPT_URL, $request->getUrl());
         curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, $request->method);
         curl_setopt($this->curl, CURLOPT_USERAGENT, $request->getUserAgent());
     }
