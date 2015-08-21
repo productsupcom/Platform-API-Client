@@ -58,4 +58,12 @@ class Reference
         }
         $this->_value = $value;
     }
+
+    /**
+     * get the defined value
+     * @return string|null
+     */
+    public function getValue() {
+        return $this->_value;
+    }
 }
