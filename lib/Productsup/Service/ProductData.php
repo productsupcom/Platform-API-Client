@@ -123,7 +123,7 @@ class ProductData extends Service {
      * @return array Submit Log for Debugging
      */
     public function commit() {
-        $this->checkSubmit(0); // send all unsent products
+        $this->checkSubmit(1); // send all unsent products
         $request = $this->getRequest();
         $request->method = Request::METHOD_POST;
         $request->postBody = array(
