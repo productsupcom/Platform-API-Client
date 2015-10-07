@@ -40,6 +40,9 @@ abstract class Service
     protected $verbose = false;
     protected $debug = false;
 
+    /** @var array additional params for request, like limit, offset, filters,... */
+    protected $params = array();
+
 
     /**
      * @param Client $Client
@@ -82,6 +85,11 @@ abstract class Service
                 $request->url .= '/'.$action;
             }
         }
+
+        if(!empty($this->params)) {
+            $request->queryParams = $this->params;
+        }
+
         $response = $this->getIoHandler()->executeRequest($request);
         $data = $response->getData();
         $list = array();
@@ -89,6 +97,15 @@ abstract class Service
             $list[] = $this->getDataModel()->fromArray($project);
         }
         return $list;
+    }
+
+    /**
+     * adding additional params for the request, e.g. limit, offset, filters,...
+     * @param $name
+     * @param $value
+     */
+    public function setParam($name, $value) {
+        $this->params[$name] = $value;
     }
 
     /**
