@@ -12,7 +12,7 @@ use Productsup\Platform\Site\Reference;
  */
 class ImportHistory extends Service {
 
-    protected $serviceName = 'importHistory';
+    protected $serviceName = 'importhistory';
     protected $parent = 'sites';
 
     public function setSite(Site $site) {
