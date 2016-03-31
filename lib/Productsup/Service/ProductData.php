@@ -124,6 +124,11 @@ class ProductData extends Service {
      */
     public function commit() {
         $this->checkSubmit(1); // send all unsent products
+
+        if(!$this->didSubmit) {
+            throw new Exceptions\ClientException('no data submitted yet');
+        }
+
         $request = $this->getRequest();
         $request->method = Request::METHOD_POST;
         $request->postBody = array(
