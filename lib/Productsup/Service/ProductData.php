@@ -247,6 +247,8 @@ class ProductData extends Service {
                 );
 
                 $this->_submit();
+            } else {
+                throw $e;
             }
         }
         $this->_productData = array();
