@@ -16,7 +16,7 @@ abstract class Service
     protected $scheme = 'https';
 
     /** @var string Service Version */
-    protected $version = 'v1';
+    protected $version = 'v2';
 
     /** @var string Service Name */
     protected $serviceName;
