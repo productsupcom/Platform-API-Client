@@ -124,6 +124,11 @@ class ProductData extends Service {
      */
     public function commit() {
         $this->checkSubmit(1); // send all unsent products
+
+        if(!$this->didSubmit) {
+            throw new Exceptions\ClientException('no data submitted yet');
+        }
+
         $request = $this->getRequest();
         $request->method = Request::METHOD_POST;
         $request->postBody = array(
@@ -227,10 +232,49 @@ class ProductData extends Service {
         $request->method = Request::METHOD_POST;
         $request->url .= '/upload';
         $request->postBody = $this->_productData;
-        $response = $this->getIoHandler()->executeRequest($request);
+
+        try {
+            $response = $this->getIoHandler()->executeRequest($request);
+        } catch (\Exception $e) {
+            $found = $this->testJson($this->_productData);
+
+            if ($found > 0) {
+                $this->_submitLog[] = sprintf(
+                    '%s: %u products with malformed json. removing affected products and retrying batch: %s',
+                    date('Y-m-d H:i:s'),
+                    $found,
+                    $this->_batchId
+                );
+
+                $this->_submit();
+            } else {
+                throw $e;
+            }
+        }
         $this->_productData = array();
         $this->logResponse($response);
         return $response->getData();
+    }
+
+    private function testJson(array &$a)
+    {
+        $found = 0;
+
+        foreach ($a as $key => $row) {
+            $j = json_encode($row);
+            if (json_last_error()) {
+                unset($a[$key]);
+                $found++;
+                continue;
+            }
+            json_decode($j);
+            if (json_last_error()) {
+                unset($a[$key]);
+                $found++;
+            }
+        }
+
+        return $found;
     }
 
     /**
