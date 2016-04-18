@@ -24,7 +24,7 @@ class Reference
             return (string)$this->_value;
         }
         return $this->_key.':'.$this->_value;
-    }    
+    }
 
     /**
      * set the value of the reference
@@ -34,15 +34,7 @@ class Reference
      */
     public function setKey($key)
     {
-        if(!$this->isValid($key)) {
-            throw new ClientException('invalid key passed');
-        }
         $this->_key = $key;
-    }
-
-
-    private function isValid($str) {
-        return preg_match('/^[a-zA-Z0-9-_]+$/',$str);
     }
 
     /**
@@ -53,9 +45,6 @@ class Reference
      */
     public function setValue($value)
     {
-        if(!$this->isValid($value)) {
-            throw new ClientException('invalid value passed');
-        }
         $this->_value = $value;
     }
 
