@@ -24,7 +24,7 @@ class Reference
             return (string)$this->_value;
         }
         return $this->_key.':'.$this->_value;
-    }    
+    }
 
     /**
      * set the value of the reference
@@ -42,7 +42,7 @@ class Reference
 
 
     private function isValid($str) {
-        return preg_match('/^[a-zA-Z0-9-_]+$/',$str);
+        return !preg_match('#:#',$str);
     }
 
     /**
