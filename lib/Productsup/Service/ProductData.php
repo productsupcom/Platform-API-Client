@@ -29,7 +29,7 @@ class ProductData extends Service {
     const TYPE_DELTA = 'delta';
 
     /** @var string this name is reserved to mark products as delete */
-    private $deleteFlagName = 'pup:isDelete';
+    private $deleteFlagName = 'pup:isdeleted';
 
     /** @var bool was data already submitted? */
     private $didSubmit = false;
@@ -178,7 +178,7 @@ class ProductData extends Service {
      * @param $isDelete bool flag if this product is a delete or insert
      * @throws Exceptions\ClientException
      */
-    private function addRow($row,$isDelete) {
+    private function addRow($row,$isDelete = false) {
         if($this->isArrayMultiDimensional($row)) {
             throw new Exceptions\ClientException('please pass only one product/row at once, rows are not allowed to contain arrays');
         }
