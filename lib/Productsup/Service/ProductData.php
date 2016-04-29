@@ -185,9 +185,6 @@ class ProductData extends Service {
         if($this->finished) {
             throw new Exceptions\ClientException('the current batch is already finished, please create a new one');
         }
-        if(array_key_exists($this->deleteFlagName,$row)) {
-            throw new Exceptions\ClientException('"'.$this->deleteFlagName.'" is a reserved name to flag deleted products, please use another name');
-        }
         if(!array_key_exists('id',$row)) {
             throw new Exceptions\ClientException('adding one column "id" to the product data is mandatory');
         }
