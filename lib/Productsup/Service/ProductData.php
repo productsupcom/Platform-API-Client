@@ -34,19 +34,19 @@ class ProductData extends Service {
     /** @var bool was data already submitted? */
     private $didSubmit = false;
 
-
     /** @var string  */
     protected $parent = 'sites';
     /** @var string  */
     protected $serviceName = 'products';
 
-
-
     /** names for the different stages for querying */
     const STAGE_IMPORT = 'import';
     const STAGE_INTERMEDIATE = 'intermediate';
+    const STAGE_INTERMEDIATE_PREVIEW = 'intermediate_preview';
     const STAGE_EXPORT = 'export';
+    const STAGE_EXPORT_PREVIEW = 'export_preview';
     const STAGE_CHANNEL = 'channel';
+    const STAGE_CHANNEL_PREVIEW = 'channel_preview';
 
     /**
      * @param Client $Client
@@ -334,10 +334,12 @@ class ProductData extends Service {
         }
     }
 
-    private function getPdaRequest($stage,$id) {
+    private function getPdaRequest($stage, $id, $preview = false) {
         $request = $this->getRequest();
         $request->method = Request::METHOD_GET;
-        $request->url = $this->scheme.'://'.$this->host.'/product/'.$this->version.'/site/'.$this->_parentIdentifier;
+        $request->url = $this->scheme.'://'.$this->host;
+        $request->url .= '/product/'.$this->version;
+        $request->url .= '/site/'.$this->_parentIdentifier;
         $request->url .= '/stage/'.$stage;
         if($id) {
             $request->url .= '/'.$id;
@@ -352,7 +354,7 @@ class ProductData extends Service {
      * @param array $params
      * @return array
      */
-    public function get($stage, $id,$params) {
+    public function get($stage, $id, $params) {
         $request = $this->getPdaRequest($stage,$id);
 
         $request->url .= '/';
@@ -366,7 +368,7 @@ class ProductData extends Service {
      * @param int|null $id id of the stage (or null for source)
      * @return array
      */
-    public function getProperties($stage,$id, $params = null) {
+    public function getProperties($stage, $id, $params = null) {
         $request = $this->getPdaRequest($stage,$id);
         if(!$id) {
             $request->url .= '/0';
