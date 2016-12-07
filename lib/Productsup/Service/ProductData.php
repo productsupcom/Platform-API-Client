@@ -20,13 +20,24 @@ class ProductData extends Service {
     /** @var string what kind of import is this? see constants for further information */
     private $importType = self::TYPE_FULL;
 
+    const VALID_IMPORT_TYPES = [
+        self::TYPE_FULL,
+        self::TYPE_DELTA,
+    ];
+
     /** @var bool mainly for debugging - if true, client does raise exceptions if tried to send discards anyway */
     private $disableDiscards = false;
 
     /** a full import, this upload replaces all earlier uploads for the referenced site, once it is completed */
     const TYPE_FULL = 'full';
+    /** added type "init" as alias of type full to ease up wording and communication */
+    const TYPE_INIT = self::TYPE_FULL;
+
     /** a delta import, this is a incremental update to the last full import of the referenced site */
     const TYPE_DELTA = 'delta';
+
+    /** added type "add" as alias of type delta to ease up wording and communication */
+    const TYPE_ADD = self::TYPE_DELTA;
 
     /** @var string this name is reserved to mark products as delete */
     private $deleteFlagName = 'pup:isdeleted';
@@ -110,7 +121,7 @@ class ProductData extends Service {
     }
 
     public function setImportType($type) {
-        if($type !== self::TYPE_FULL && $type !== self::TYPE_DELTA) {
+        if (!in_array($type, self::VALID_IMPORT_TYPES)) {
             throw new Exceptions\ClientException('unsupported import type, use one of the type constants');
         }
         $this->importType = $type;
