@@ -33,7 +33,7 @@ class Sites extends Service
     public function get($id = null)
     {
         if ($id === null && $this->Reference !== null) {
-            return $this->_get($this->Reference);
+            $id = $this->Reference;
         }
 
         return $this->_get($id);
