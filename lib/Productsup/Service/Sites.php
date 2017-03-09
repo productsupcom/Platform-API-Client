@@ -27,7 +27,7 @@ class Sites extends Service
     }
 
     /**
-     * @param null $id
+     * @param null|int|\Productsup\Platform\Site\Reference $id
      * @return \Productsup\Platform\Site[]
      */
     public function get($id = null)
@@ -73,8 +73,15 @@ class Sites extends Service
         return $this->_update($site);
     }
 
+
+    /**
+     * set a site reference for future get() requests
+     * @param null|\Productsup\Platform\Site\Reference $Reference
+     * @return self
+     */
     public function setReference(Reference $Reference = null)
     {
         $this->Reference = $Reference;
+        return $this;
     }
 }
