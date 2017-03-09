@@ -1,23 +1,28 @@
 <?php
 
 namespace Productsup\Service;
+
 use Productsup\Platform\Project;
-use Productsup\Exceptions;
 use Productsup\Platform\Site;
+use Productsup\Platform\Site\Reference;
 
-class Sites extends Service {
-
+class Sites extends Service
+{
     protected $serviceName = 'sites';
     protected $parent = 'projects';
 
-    public function setProject(Project $Project) {
+    private $Reference;
+
+    public function setProject(Project $Project)
+    {
         $this->_parentIdentifier = $Project->id;
     }
 
     /**
      * @return \Productsup\Platform\DataModel|Site
      */
-    protected function getDataModel() {
+    protected function getDataModel()
+    {
         return new Site();
     }
 
@@ -25,7 +30,12 @@ class Sites extends Service {
      * @param null $id
      * @return \Productsup\Platform\Site[]
      */
-    public function get($id = null) {
+    public function get($id = null)
+    {
+        if ($id === null && $this->Reference !== null) {
+            return $this->_get($this->Reference);
+        }
+
         return $this->_get($id);
     }
 
@@ -35,7 +45,8 @@ class Sites extends Service {
      * @param Site $Site
      * @return Site
      */
-    public function insert(Site $Site) {
+    public function insert(Site $Site)
+    {
         return $this->_insert($Site);
     }
 
@@ -44,8 +55,9 @@ class Sites extends Service {
      * @param int|Site $id
      * @return bool
      */
-    public function delete($id) {
-        if($id instanceof Site) {
+    public function delete($id)
+    {
+        if ($id instanceof Site) {
             $id = $id->id;
         }
         return $this->_delete($id);
@@ -56,7 +68,13 @@ class Sites extends Service {
      * @param Site $site
      * @return Site
      */
-    public function update(Site $site) {
+    public function update(Site $site)
+    {
         return $this->_update($site);
+    }
+
+    public function setReference(Reference $Reference = null)
+    {
+        $this->Reference = $Reference;
     }
 }
