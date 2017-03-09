@@ -71,7 +71,7 @@ abstract class Service
 
     /**
      * get a list of projects
-     * @param null|int $id|Reference
+     * @param null|int|Reference $id
      * @throws \Productsup\Exceptions\ServerException
      * @throws \Productsup\Exceptions\ClientException
      * @return \Productsup\Platform\DataModel[]
