@@ -118,7 +118,8 @@ class ProductData extends Service {
 
     /**
      * give a way to set batch id for multi-request/multi-instance submits
-     * @param string $batchId
+     * @param $batchId
+     * @return $this
      * @throws Exceptions\ClientException
      */
     public function setBatchId($batchId) {
@@ -126,6 +127,8 @@ class ProductData extends Service {
             throw new Exceptions\ClientException('invalid batch Id');
         }
         $this->_batchId = md5($batchId);
+
+        return $this;
     }
 
     /**
