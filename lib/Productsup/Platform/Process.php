@@ -14,6 +14,7 @@ class Process extends DataModel {
      * adds a reference to a site that can later be used as an identifier
      * note: this is only possible when creating a site or project
      * @param Reference $reference
+     * @throws ClientException When adding non site reference
      */
     public function addReference(Reference $reference) {
         if ($reference->getKey() != Reference::REFERENCE_SITE) {
@@ -26,13 +27,19 @@ class Process extends DataModel {
 
     /**
      * cast data to an array
+     * @param boolean $full
      * @return array
      */
-    public function toArray() {
-        return array(
+    public function toArray($full = true) {
+        $data = array(
             'id' => $this->action_id,
             'action' => $this->action,
-            'site_id' => $this->site_id,
         );
+
+        if ($full) {
+            $data['site_id'] = $this->site_id;
+        }
+
+        return $data;
     }
 }

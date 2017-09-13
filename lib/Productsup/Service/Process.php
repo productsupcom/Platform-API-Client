@@ -45,7 +45,7 @@ class Process extends Service {
 
         $request = $this->getRequest();
         $request->method = Request::METHOD_POST;
-        $request->postBody = $model->toArray();
+        $request->postBody = $model->toArray(false);
         $request->url .= '/'.$model->site_id;
         $data = $this->executeRequest($request);
 
