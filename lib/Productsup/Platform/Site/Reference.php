@@ -66,4 +66,12 @@ class Reference
     public function getValue() {
         return $this->_value;
     }
+
+    /**
+     * get the defined key
+     * @return string|null
+     */
+    public function getKey() {
+        return $this->_key;
+    }
 }
