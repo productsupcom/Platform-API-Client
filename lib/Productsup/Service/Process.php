@@ -9,10 +9,10 @@ use Productsup\Platform\Process as ProcessModel;
 class Process extends Service {
 
     protected $serviceName = 'process';
-    protected $validActions = [
+    protected $validActions = array(
         'import', 'export', 'channel', 'all', 'export-all'
-    ];
-    protected $actionsRequiringId = ['export', 'channel'];
+    );
+    protected $actionsRequiringId = array('export', 'channel');
 
     // Not applicable to process
     protected function getDataModel()
