@@ -2,5 +2,6 @@
 
 namespace Productsup\Platform;
 
-class JobStatus extends DataModel {
+class JobStatus extends DataModel
+{
 }

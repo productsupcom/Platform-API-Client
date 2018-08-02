@@ -2,7 +2,8 @@
 
 namespace Productsup\Platform;
 
-class ImportHistory extends DataModel {
+class ImportHistory extends DataModel
+{
     public $id;
     public $site_id;
     public $import_time;

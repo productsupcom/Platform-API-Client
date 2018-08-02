@@ -1,6 +1,7 @@
 <?php
 
 namespace Productsup\Service;
+
 use Productsup\Client;
 use Productsup\Exceptions\ClientException;
 use Productsup\Http\Request;
@@ -41,129 +42,152 @@ abstract class Service
     protected $debug = false;
 
     /** @var array additional params for request, like limit, offset, filters,... */
-    protected $params = array();
-
+    protected $params = [];
 
     /**
      * @param Client $Client
      */
-    public function __construct(Client $Client) {
+    public function __construct(Client $Client)
+    {
         $this->_Client = $Client;
         // just for debugging, allow to pass params to trigger verbose and debug mode
-        if(isset($_SERVER['argv']) && count($_SERVER['argv'])) {
+        if (isset($_SERVER['argv']) && \count($_SERVER['argv'])) {
             unset($_SERVER['argv'][0]);
-            if(in_array('v',$_SERVER['argv'])) {
+            if (\in_array('v', $_SERVER['argv'])) {
                 $this->verbose = true;
             }
-            if(in_array('d',$_SERVER['argv'])) {
+            if (\in_array('d', $_SERVER['argv'])) {
                 $this->debug = true;
             }
         }
     }
 
     /**
-     * set verbose mode of api for debugging
+     * set verbose mode of api for debugging.
+     *
      * @param $verbose
      */
-    public function setVerbose($verbose) {
-        $this->verbose = (bool)$verbose;
+    public function setVerbose($verbose)
+    {
+        $this->verbose = (bool) $verbose;
     }
 
     /**
-     * get a list of projects
-     * @param null|int $id
+     * get a list of projects.
+     *
+     * @param null|int   $id
+     * @param null|mixed $action
+     *
      * @throws \Productsup\Exceptions\ServerException
      * @throws \Productsup\Exceptions\ClientException
+     *
      * @return \Productsup\Platform\DataModel[]
      */
-    protected function _get($id = null, $action = null) {
+    protected function _get($id = null, $action = null)
+    {
         $request = $this->getRequest();
         $request->method = Request::METHOD_GET;
-        if($id) {
-            $request->url .= '/'.$id;
-            if($action) {
-                $request->url .= '/'.$action;
+        if ($id) {
+            $request->url .= '/' . $id;
+            if ($action) {
+                $request->url .= '/' . $action;
             }
         }
 
-        if(!empty($this->params)) {
+        if (!empty($this->params)) {
             $request->queryParams = $this->params;
         }
 
         $response = $this->getIoHandler()->executeRequest($request);
         $data = $response->getData();
-        $list = array();
+        $list = [];
         foreach ($data[ucfirst($this->serviceName)] as $project) {
             $list[] = $this->getDataModel()->fromArray($project);
         }
+
         return $list;
     }
 
     /**
      * adding additional params for the request, e.g. limit, offset, filters,...
+     *
      * @param $name
      * @param $value
      */
-    public function setParam($name, $value) {
+    public function setParam($name, $value)
+    {
         $this->params[$name] = $value;
     }
 
     /**
-     * deletes the resources identified by given id
+     * deletes the resources identified by given id.
+     *
      * @param $id
+     *
      * @throws \Productsup\Exceptions\ClientException
+     *
      * @return bool true on success
      */
-    protected function _delete($id) {
-        if(empty($id)) {
+    protected function _delete($id)
+    {
+        if (empty($id)) {
             throw new ClientException('you have to provide an id, or an object with an id for deleting');
         }
         $request = $this->getRequest();
         $request->method = Request::METHOD_DELETE;
-        $request->url .= '/'.$id;
+        $request->url .= '/' . $id;
 
         $response = $this->getIoHandler()->executeRequest($request);
         $data = $response->getData();
-        return isset($data['success']) ? $data['success'] : false;
+
+        return $data['success'] ?? false;
     }
 
     /**
      * @param DataModel $dataModel
+     *
      * @return static
      */
-    protected function _insert($dataModel) {
+    protected function _insert($dataModel)
+    {
         $request = $this->getRequest();
         $request->method = Request::METHOD_POST;
         $request->postBody = $dataModel->toArray();
         $data = $this->executeRequest($request);
+
         return $this->getDataModel()->fromArray($data[$this->getResultField()][0]);
     }
 
     /**
-     * returns the name of the field where the api is expected to return the actual object
+     * returns the name of the field where the api is expected to return the actual object.
+     *
      * @return string
      */
-    protected function getResultField() {
+    protected function getResultField()
+    {
         return ucfirst($this->serviceName);
     }
 
     /**
      * @param DataModel $dataModel
+     *
      * @return static
      */
-    protected function _update($dataModel) {
+    protected function _update($dataModel)
+    {
         $request = $this->getRequest();
         $request->method = Request::METHOD_PUT;
         $request->postBody = $dataModel->toArray();
-        if($dataModel->id) {
-            $request->url .= '/'.$dataModel->id;
+        if ($dataModel->id) {
+            $request->url .= '/' . $dataModel->id;
         }
         $data = $this->executeRequest($request);
+
         return $this->getDataModel()->fromArray($data[ucfirst($this->serviceName)][0]);
     }
 
     /** @return DataModel */
-    protected abstract function getDataModel();
+    abstract protected function getDataModel();
 
     /**
      * @return Client
@@ -174,67 +198,83 @@ abstract class Service
     }
 
     /**
-     * returns a new request object
+     * returns a new request object.
+     *
      * @return Request
      */
-    protected function getRequest() {
+    protected function getRequest()
+    {
         $request = new Request($this->getClient());
         $request->url = $this->getUrl();
+
         return $request;
     }
 
     /**
-     * returns the base url for the api
+     * returns the base url for the api.
+     *
      * @return string
      */
-    protected function getBaseUrl() {
-        return $this->scheme.'://'.$this->host.'/'.$this->api.'/'.$this->version.'/';
+    protected function getBaseUrl()
+    {
+        return $this->scheme . '://' . $this->host . '/' . $this->api . '/' . $this->version . '/';
     }
 
     /**
-     * returns the part of the url referencing to the current service
+     * returns the part of the url referencing to the current service.
+     *
      * @return string
      */
-    protected function getServiceUrl() {
+    protected function getServiceUrl()
+    {
         $url = '';
-        if($this->parent && $this->_parentIdentifier) {
-            $url .= $this->parent.'/'.$this->_parentIdentifier.'/';
+        if ($this->parent && $this->_parentIdentifier) {
+            $url .= $this->parent . '/' . $this->_parentIdentifier . '/';
         }
         $url .= $this->serviceName;
+
         return $url;
     }
 
     /**
-     * returns the full url to the api endpoint of the current service
+     * returns the full url to the api endpoint of the current service.
+     *
      * @return string
      */
-    protected function getUrl() {
-        return $this->getBaseUrl().$this->getServiceUrl();
+    protected function getUrl()
+    {
+        return $this->getBaseUrl() . $this->getServiceUrl();
     }
 
-
     /**
-     * returns the class that handles network requests, right now only Curl is supported
+     * returns the class that handles network requests, right now only Curl is supported.
+     *
      * @return Curl
      */
-    protected function getIoHandler() {
+    protected function getIoHandler()
+    {
         $io = new Curl();
-        if($this->verbose) {
+        if ($this->verbose) {
             $io->verbose = true;
         }
-        if($this->debug) {
+        if ($this->debug) {
             $io->debug = true;
         }
+
         return $io;
     }
 
     /**
-     * executes the current request and returns it's result as an array
+     * executes the current request and returns it's result as an array.
+     *
      * @param $request
+     *
      * @return array
      */
-    protected function executeRequest($request) {
+    protected function executeRequest($request)
+    {
         $response = $this->getIoHandler()->executeRequest($request);
+
         return $response->getData();
     }
 }

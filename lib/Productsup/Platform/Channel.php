@@ -2,7 +2,8 @@
 
 namespace Productsup\Platform;
 
-class Channel extends DataModel {
+class Channel extends DataModel
+{
     public $id;
     public $site_id;
     public $name;

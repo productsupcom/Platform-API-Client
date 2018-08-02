@@ -1,8 +1,9 @@
 <?php
+
 namespace Productsup;
 
-
-class Query {
+class Query
+{
     /** @var string query conditions */
     public $filter = '';
     /** @var int limit for returned entries */
@@ -10,8 +11,7 @@ class Query {
     /** @var int offset for returned entries */
     public $offset = 0;
     /** @var array fields returned, if empty all fields are returned */
-    public $fields = array();
+    public $fields = [];
     /** @var int should also hidden fields be included? */
     public $hidden = 0;
-
 }

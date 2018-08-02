@@ -2,7 +2,8 @@
 
 namespace Productsup\Platform;
 
-class Source extends DataModel {
+class Source extends DataModel
+{
     const TYPE_DEFAULT = 1;
     const TYPE_ADDITIONAL = 2;
 

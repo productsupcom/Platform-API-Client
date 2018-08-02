@@ -2,7 +2,8 @@
 
 namespace Productsup\Platform;
 
-class Token extends DataModel {
+class Token extends DataModel
+{
     public $id;
     public $user_id;
     public $token;

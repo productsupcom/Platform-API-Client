@@ -2,7 +2,8 @@
 
 namespace Productsup\Platform;
 
-class User extends DataModel {
+class User extends DataModel
+{
     public $id;
     public $email;
     public $client_id;

@@ -1,7 +1,9 @@
 <?php
+
 namespace Productsup\Platform\IntelliAd;
 
-class JobStatus extends \Productsup\Platform\JobStatus {
+class JobStatus extends \Productsup\Platform\JobStatus
+{
     public $id;
     public $jobId;
     public $jobStatus;

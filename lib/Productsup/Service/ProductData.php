@@ -1,20 +1,22 @@
 <?php
 
 namespace Productsup\Service;
+
 use Productsup\Client as Client;
+use Productsup\Exceptions;
 use Productsup\Http\Request as Request;
 use Productsup\Http\Response;
-use Productsup\Exceptions;
 use Productsup\Platform\Site\Reference;
 
-class ProductData extends Service {
-    /** @var array stores products to add or delete*/
-    private $_productData = array();
+class ProductData extends Service
+{
+    /** @var array stores products to add or delete */
+    private $_productData = [];
     /** @var string identifier of the current batch */
     private $_batchId;
     /** @var array logs os all submits */
-    private $_submitLog = array();
-    /** @var bool is the current batch finished?*/
+    private $_submitLog = [];
+    /** @var bool is the current batch finished? */
     private $finished = false;
 
     /** @var string what kind of import is this? see constants for further information */
@@ -34,9 +36,9 @@ class ProductData extends Service {
     /** @var bool was data already submitted? */
     private $didSubmit = false;
 
-    /** @var string  */
+    /** @var string */
     protected $parent = 'sites';
-    /** @var string  */
+    /** @var string */
     protected $serviceName = 'products';
 
     /** names for the different stages for querying */
@@ -50,104 +52,122 @@ class ProductData extends Service {
 
     /**
      * @param Client $Client
-     * @param bool $useShutdownHandler set to false to disable shutdown handler
+     * @param bool   $useShutdownHandler set to false to disable shutdown handler
      */
-    public function __construct(Client $Client, $useShutdownHandler = true) {
+    public function __construct(Client $Client, $useShutdownHandler = true)
+    {
         parent::__construct($Client);
         $this->createBatchId();
-        if($useShutdownHandler) {
-            register_shutdown_function(array($this, 'shutdownHandler'));
+        if ($useShutdownHandler) {
+            register_shutdown_function([$this, 'shutdownHandler']);
         }
     }
 
     /**
-     * creates a new batch id for multi-request submits
+     * creates a new batch id for multi-request submits.
      */
-    private function createBatchId() {
-        $this->_batchId = md5(microtime().uniqid());
+    private function createBatchId()
+    {
+        $this->_batchId = md5(microtime() . uniqid());
     }
 
-    public function disableDiscards() {
+    public function disableDiscards()
+    {
         $this->disableDiscards = true;
     }
 
     /**
-     * add one product to the data sent to the API
+     * add one product to the data sent to the API.
      *
      * note:
      * the data does not get sent to the server until the post limit is reached or you commit() the upload
      * uncommitted uploads will be discarded and are not processed
+     *
      * @param array $product A single product
+     *
      * @throws \Productsup\Exceptions\ClientException
      */
-    public function insert(array $product) {
-        $this->addRow($product,false);
+    public function insert(array $product)
+    {
+        $this->addRow($product, false);
     }
 
     /**
-     * delete one product to the data sent to the API
+     * delete one product to the data sent to the API.
      *
      * note:
      * the data does not get sent to the server until the post limit is reached or you commit() the upload
      * uncommitted uploads will be discarded and are not processed
+     *
      * @param array $product A single product
+     *
      * @throws \Productsup\Exceptions\ClientException
      */
-    public function delete(array $product) {
+    public function delete(array $product)
+    {
         $this->addRow($product, true);
     }
 
     /**
-     * define the site these products belong to
+     * define the site these products belong to.
+     *
      * @param Reference $reference
+     *
      * @throws Exceptions\ClientException
      */
-    public function setReference(Reference $reference) {
-        if(count($this->_submitLog)) {
+    public function setReference(Reference $reference)
+    {
+        if (\count($this->_submitLog)) {
             throw new Exceptions\ClientException('references may not get updated after the first data was submitted');
         }
-        $this->_parentIdentifier = (string)$reference;
+        $this->_parentIdentifier = (string) $reference;
     }
 
-    public function setImportType($type) {
-        if($type !== self::TYPE_FULL && $type !== self::TYPE_DELTA) {
+    public function setImportType($type)
+    {
+        if ($type !== self::TYPE_FULL && $type !== self::TYPE_DELTA) {
             throw new Exceptions\ClientException('unsupported import type, use one of the type constants');
         }
         $this->importType = $type;
     }
 
-
     /**
      * send products to the api that were not sent yet,
-     * and tells the api that the current batch is complete and may get processed
+     * and tells the api that the current batch is complete and may get processed.
+     *
      * @return array Submit Log for Debugging
      */
-    public function commit() {
+    public function commit()
+    {
         $this->checkSubmit(1); // send all unsent products
 
-        if(!$this->didSubmit) {
+        if (!$this->didSubmit) {
             throw new Exceptions\ClientException('no data submitted yet');
         }
 
         $request = $this->getRequest();
         $request->method = Request::METHOD_POST;
-        $request->postBody = array(
-            'type' => $this->importType
-        );
+        $request->postBody = [
+            'type' => $this->importType,
+        ];
         $request->url .= '/commit';
         $response = $this->getIoHandler()->executeRequest($request);
         $this->finished = true;
+
         return $this->getSubmitLog();
     }
 
     /**
-     * if you do not want to continue one batch, you can discard it so the files get also removed from the server
-     * @return bool
+     * if you do not want to continue one batch, you can discard it so the files get also removed from the server.
+     *
      * @throws Exceptions\ClientException
      * @throws Exceptions\ServerException
+     *
+     * @return bool
      */
-    public function discard() {
-        if($this->disableDiscards) {
+    public function discard()
+    {
+        if ($this->disableDiscards) {
             throw new Exceptions\ClientException('discards were disabled, but tried to send anyway');
         }
         $request = $this->getRequest();
@@ -155,16 +175,20 @@ class ProductData extends Service {
         $request->url .= '/discard';
         $response = $this->getIoHandler()->executeRequest($request)->getData();
         $this->finished = true;
-        return isset($response['success']) ? $response['success'] : false;
+
+        return $response['success'] ?? false;
     }
 
     /**
      * define maximum number of products sent within one request
-     * you still may provide more data, but internally the products will get already transferred to the server before
+     * you still may provide more data, but internally the products will get already transferred to the server before.
+     *
      * @param int $limit
+     *
      * @throws Exceptions\ClientException
      */
-    public function setPostLimit($limit) {
+    public function setPostLimit($limit)
+    {
         if ($limit < 1) {
             throw new Exceptions\ClientException('Post limit lower 1 not allowed');
         } elseif ($limit > 10000) {
@@ -176,20 +200,22 @@ class ProductData extends Service {
     /**
      * @param $row array of the actual data
      * @param $isDelete bool flag if this product is a delete or insert
+     *
      * @throws Exceptions\ClientException
      */
-    private function addRow($row,$isDelete = false) {
-        if($this->isArrayMultiDimensional($row)) {
+    private function addRow($row, $isDelete = false)
+    {
+        if ($this->isArrayMultiDimensional($row)) {
             throw new Exceptions\ClientException('please pass only one product/row at once, rows are not allowed to contain arrays');
         }
-        if($this->finished) {
+        if ($this->finished) {
             throw new Exceptions\ClientException('the current batch is already finished, please create a new one');
         }
-        if(!array_key_exists('id',$row)) {
+        if (!array_key_exists('id', $row)) {
             throw new Exceptions\ClientException('adding one column "id" to the product data is mandatory');
         }
 
-        if($isDelete) {
+        if ($isDelete) {
             $row[$this->deleteFlagName] = 1;
         }
         $this->_productData[] = $row;
@@ -197,32 +223,41 @@ class ProductData extends Service {
     }
 
     /**
-     * check if data reached the limit, if so commit it
-     * @var int $limit maximum rows
+     * check if data reached the limit, if so commit it.
+     *
+     * @var int maximum rows
+     *
+     * @param mixed $limit
      */
-    private function checkSubmit($limit) {
-        if (count($this->_productData) >= $limit) {
+    private function checkSubmit($limit)
+    {
+        if (\count($this->_productData) >= $limit) {
             $this->_submit();
         }
     }
 
     /**
-     * returns log messages from submits and empties the log
+     * returns log messages from submits and empties the log.
+     *
      * @return array
      */
-    private function getSubmitLog() {
+    private function getSubmitLog()
+    {
         $log = $this->_submitLog;
-        $this->_submitLog = array();
+        $this->_submitLog = [];
+
         return $log;
     }
 
     /**
-     * submits products to the api
+     * submits products to the api.
+     *
      * @return array response of the api
      */
-    private function _submit() {
-        if(count($this->_productData) == 0) { // no data, do not send request
-            return array();
+    private function _submit()
+    {
+        if (\count($this->_productData) == 0) { // no data, do not send request
+            return [];
         }
         $this->didSubmit = true;
         $request = $this->getRequest();
@@ -248,8 +283,9 @@ class ProductData extends Service {
                 throw $e;
             }
         }
-        $this->_productData = array();
+        $this->_productData = [];
         $this->logResponse($response);
+
         return $response->getData();
     }
 
@@ -275,108 +311,131 @@ class ProductData extends Service {
     }
 
     /**
-     * convert api response to a log message
+     * convert api response to a log message.
+     *
      * @param Response $response
      */
-    private function logResponse(Response $response) {
+    private function logResponse(Response $response)
+    {
         $data = $response->getData();
-        foreach($data as $key => $val) {
-            if($key == 'success') continue; // we know it was a success, otherwise it would have failed before
-            $this->_submitLog[] = date('Y-m-d H:i:s').' added '.$val['count'].' product(s) '.' for '.$key.' to batch '.$this->_batchId;
+        foreach ($data as $key => $val) {
+            if ($key == 'success') {
+                continue;
+            } // we know it was a success, otherwise it would have failed before
+            $this->_submitLog[] = date('Y-m-d H:i:s') . ' added ' . $val['count'] . ' product(s) ' . ' for ' . $key . ' to batch ' . $this->_batchId;
         }
     }
 
     /**
-     * try to check quickly if passed array is multi dimensional
+     * try to check quickly if passed array is multi dimensional.
+     *
      * @param $array
+     *
      * @return bool
      */
-    private function isArrayMultiDimensional($array) {
-        return !((count($array) == count($array, COUNT_RECURSIVE)));
+    private function isArrayMultiDimensional($array)
+    {
+        return !((\count($array) == \count($array, COUNT_RECURSIVE)));
     }
 
-
     /**
-     * returns the currently defined post limit
+     * returns the currently defined post limit.
+     *
      * @return int
      */
-    public function getPostLimit() {
+    public function getPostLimit()
+    {
         return $this->_postLimit;
     }
 
     /**
-     * url to the api endpoint requested
-     * @return string
+     * url to the api endpoint requested.
+     *
      * @throws Exceptions\ClientException
+     *
+     * @return string
      */
-    protected function getServiceUrl() {
-        if(!$this->_parentIdentifier) {
+    protected function getServiceUrl()
+    {
+        if (!$this->_parentIdentifier) {
             throw new Exceptions\ClientException('please set a reference before the first data is submitted');
         }
-        return $this->parent.'/'.$this->_parentIdentifier.'/'.$this->serviceName.'/'.$this->_batchId;
+
+        return $this->parent . '/' . $this->_parentIdentifier . '/' . $this->serviceName . '/' . $this->_batchId;
     }
 
     /**
      * to stay compatible with parent abstract class.
-     * however, data models are not used for batch services
+     * however, data models are not used for batch services.
+     *
      * @throws \Exception
      */
-    protected function getDataModel() {
+    protected function getDataModel()
+    {
         throw new \Exception('Data Model is not needed/supported for batch services');
     }
 
     /**
-     * discard sent products if they were not handled until the service is unset
+     * discard sent products if they were not handled until the service is unset.
      */
-    public function shutdownHandler() {
-        if($this->didSubmit && !$this->finished) {
+    public function shutdownHandler()
+    {
+        if ($this->didSubmit && !$this->finished) {
             $this->discard();
         }
     }
 
-    private function getPdaRequest($stage, $id, $preview = false) {
+    private function getPdaRequest($stage, $id, $preview = false)
+    {
         $request = $this->getRequest();
         $request->method = Request::METHOD_GET;
-        $request->url = $this->scheme.'://'.$this->host;
-        $request->url .= '/product/'.$this->version;
-        $request->url .= '/site/'.$this->_parentIdentifier;
-        $request->url .= '/stage/'.$stage;
-        if($id) {
-            $request->url .= '/'.$id;
+        $request->url = $this->scheme . '://' . $this->host;
+        $request->url .= '/product/' . $this->version;
+        $request->url .= '/site/' . $this->_parentIdentifier;
+        $request->url .= '/stage/' . $stage;
+        if ($id) {
+            $request->url .= '/' . $id;
         }
 
         return $request;
     }
 
     /**
-     * @param string $stage source|intermediate|channel
-     * @param int|null $id id of the stage (or null for source)
-     * @param array $params
+     * @param string   $stage  source|intermediate|channel
+     * @param int|null $id     id of the stage (or null for source)
+     * @param array    $params
+     *
      * @return array
      */
-    public function get($stage, $id, $params) {
-        $request = $this->getPdaRequest($stage,$id);
+    public function get($stage, $id, $params)
+    {
+        $request = $this->getPdaRequest($stage, $id);
 
         $request->url .= '/';
-        $request->queryParams = (array)$params;
+        $request->queryParams = (array) $params;
         $data = $this->executeRequest($request);
-        return isset($data['products']) ? $data['products'] : array();
+
+        return $data['products'] ?? [];
     }
 
     /**
-     * @param string $stage source|intermediate|channel
-     * @param int|null $id id of the stage (or null for source)
+     * @param string     $stage  source|intermediate|channel
+     * @param int|null   $id     id of the stage (or null for source)
+     * @param null|mixed $params
+     *
      * @return array
      */
-    public function getProperties($stage, $id, $params = null) {
-        $request = $this->getPdaRequest($stage,$id);
-        if(!$id) {
+    public function getProperties($stage, $id, $params = null)
+    {
+        $request = $this->getPdaRequest($stage, $id);
+        if (!$id) {
             $request->url .= '/0';
         }
         $request->url .= '/properties/';
-        if($params) {
-            $request->queryParams = (array)$params;
+        if ($params) {
+            $request->queryParams = (array) $params;
         }
+
         return $this->executeRequest($request);
     }
 }

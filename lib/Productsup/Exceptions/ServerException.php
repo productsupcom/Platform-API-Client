@@ -6,5 +6,9 @@
  * Please read Exception message for further information
  * User: Chris Sachs
  */
+
 namespace Productsup\Exceptions;
-class ServerException extends \Exception{}
+
+class ServerException extends \Exception
+{
+}

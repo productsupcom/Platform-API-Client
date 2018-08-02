@@ -1,15 +1,18 @@
 <?php
+
 namespace Productsup\Service\IntelliAd;
-class JobStatus extends \Productsup\Service\JobStatus {
+
+class JobStatus extends \Productsup\Service\JobStatus
+{
     protected $serviceName = 'jobstatuses/intelliad';
 
-    protected function getResultField() {
+    protected function getResultField()
+    {
         return 'Jobstatuses';
     }
 
-    protected function getDataModel() {
+    protected function getDataModel()
+    {
         return new \Productsup\Platform\IntelliAd\JobStatus();
     }
-
-
 }

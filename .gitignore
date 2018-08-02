@@ -1,4 +1,5 @@
 vendor/
 test/
-composer.lock
 examples/customers/*
+.php_cs.cache
+.php_cs

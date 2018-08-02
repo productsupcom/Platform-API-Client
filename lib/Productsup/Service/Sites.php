@@ -28,6 +28,7 @@ class Sites extends Service
 
     /**
      * @param null $id
+     *
      * @return \Productsup\Platform\Site[]
      */
     public function get($id = null)
@@ -42,7 +43,9 @@ class Sites extends Service
     /**
      * insert one site
      * notice that you need to set a valid project with setProject() or add a valid project_id to the passed object.
+     *
      * @param Site $Site
+     *
      * @return Site
      */
     public function insert(Site $Site)
@@ -51,8 +54,10 @@ class Sites extends Service
     }
 
     /**
-     * delete one site
+     * delete one site.
+     *
      * @param int|Site $id
+     *
      * @return bool
      */
     public function delete($id)
@@ -60,12 +65,15 @@ class Sites extends Service
         if ($id instanceof Site) {
             $id = $id->id;
         }
+
         return $this->_delete($id);
     }
 
     /**
-     * update one existing site
+     * update one existing site.
+     *
      * @param Site $site
+     *
      * @return Site
      */
     public function update(Site $site)

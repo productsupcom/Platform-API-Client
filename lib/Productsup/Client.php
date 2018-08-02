@@ -4,7 +4,8 @@ namespace Productsup;
 
 use Productsup\Exceptions\ClientException;
 
-class Client {
+class Client
+{
     /** var $id int Productsup Account Id */
     public $id;
 
@@ -12,15 +13,17 @@ class Client {
     public $secret;
 
     /**
-     * generates access token from given credentials
+     * generates access token from given credentials.
      */
-    public function getToken() {
-        if(!$this->id) {
+    public function getToken()
+    {
+        if (!$this->id) {
             throw new ClientException('there is no id set to your client, please add the id you identify with');
         }
-        if(!$this->secret) {
+        if (!$this->secret) {
             throw new ClientException('there is no secret set to your client, please add the secret you identify with');
         }
+
         return sprintf('%s:%s', $this->id, $this->secret);
     }
 }
