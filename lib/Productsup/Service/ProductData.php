@@ -116,7 +116,6 @@ class ProductData extends Service {
         $this->importType = $type;
     }
 
-
     /**
      * send products to the api that were not sent yet,
      * and tells the api that the current batch is complete and may get processed
@@ -137,6 +136,7 @@ class ProductData extends Service {
         $request->url .= '/commit';
         $response = $this->getIoHandler()->executeRequest($request);
         $this->finished = true;
+        $this->createBatchId();
         return $this->getSubmitLog();
     }
 
@@ -155,6 +155,7 @@ class ProductData extends Service {
         $request->url .= '/discard';
         $response = $this->getIoHandler()->executeRequest($request)->getData();
         $this->finished = true;
+        $this->createBatchId();
         return isset($response['success']) ? $response['success'] : false;
     }
 
