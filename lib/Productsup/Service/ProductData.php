@@ -54,17 +54,41 @@ class ProductData extends Service {
      */
     public function __construct(Client $Client, $useShutdownHandler = true) {
         parent::__construct($Client);
-        $this->createBatchId();
         if($useShutdownHandler) {
             register_shutdown_function(array($this, 'shutdownHandler'));
         }
     }
 
     /**
+     * @return \Productsup\Service\ProductData
+     * @throws \Productsup\Exceptions\ClientException
+     */
+    public function __clone()
+    {
+        if ($this->_batchId) {
+            throw new Exceptions\ClientException('a batch id is already generated, please create a new instance');
+        }
+        if (!empty($this->_productData)) {
+            throw new Exceptions\ClientException('products are added already, please create a new instance');
+        }
+        if ($this->didSubmit) {
+            throw new Exceptions\ClientException('the current batch is already submitted, please create a new instance');
+        }
+        if ($this->finished) {
+            throw new Exceptions\ClientException('the current batch is already finished, please create a new instance');
+        }
+
+        return clone $this;
+    }
+
+
+    /**
      * creates a new batch id for multi-request submits
      */
     private function createBatchId() {
-        $this->_batchId = md5(microtime().uniqid());
+        if (is_null($this->_batchId)) {
+            $this->_batchId = md5(microtime() . uniqid());
+        }
     }
 
     public function disableDiscards() {
@@ -129,6 +153,7 @@ class ProductData extends Service {
             throw new Exceptions\ClientException('no data submitted yet');
         }
 
+        $this->createBatchId();
         $request = $this->getRequest();
         $request->method = Request::METHOD_POST;
         $request->postBody = array(
@@ -224,6 +249,7 @@ class ProductData extends Service {
         if(count($this->_productData) == 0) { // no data, do not send request
             return array();
         }
+        $this->createBatchId();
         $this->didSubmit = true;
         $request = $this->getRequest();
         $request->method = Request::METHOD_POST;
