@@ -173,6 +173,10 @@ class ProductData extends Service {
         if($this->disableDiscards) {
             throw new Exceptions\ClientException('discards were disabled, but tried to send anyway');
         }
+        if(!$this->didSubmit) {
+            throw new Exceptions\ClientException('no data submitted yet');
+        }
+
         $request = $this->getRequest();
         $request->method = Request::METHOD_POST;
         $request->url .= '/discard';
