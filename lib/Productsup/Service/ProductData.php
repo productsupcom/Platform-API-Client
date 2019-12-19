@@ -77,8 +77,6 @@ class ProductData extends Service {
         if ($this->finished) {
             throw new Exceptions\ClientException('the current batch is already finished, please create a new instance');
         }
-
-        return clone $this;
     }
 
 
