@@ -17,7 +17,7 @@ class Request
 
     public $queryParams = array();
 
-    public $allowCompression = true;
+    public $allowCompression = false;
 
     private $_Client;
 
