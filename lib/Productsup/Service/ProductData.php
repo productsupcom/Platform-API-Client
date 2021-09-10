@@ -254,6 +254,7 @@ class ProductData extends Service {
         $this->createBatchId();
         $this->didSubmit = true;
         $request = $this->getRequest();
+        $request->allowCompression = true;
         $request->method = Request::METHOD_POST;
         $request->url .= '/upload';
         $request->postBody = $this->_productData;
