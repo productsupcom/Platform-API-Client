@@ -138,6 +138,20 @@ class ProductData extends Service {
         $this->importType = $type;
     }
 
+    /**
+     * give a way to set batch id for multi-request/multi-instance submits
+     * @param $batchId
+     * @return $this
+     * @throws Exceptions\ClientException
+     */
+    public function setBatchId($batchId) {
+        if (!$batchId) {
+            throw new Exceptions\ClientException('invalid batch Id');
+        }
+        $this->_batchId = md5($batchId);
+
+        return $this;
+    }
 
     /**
      * send products to the api that were not sent yet,
