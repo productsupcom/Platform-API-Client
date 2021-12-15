@@ -19,6 +19,8 @@ class ProductData extends Service {
 
     /** @var string what kind of import is this? see constants for further information */
     private $importType = self::TYPE_FULL;
+    /** @ var bool Whether the automatic triggering of an import & export should be scheduled. */
+    private $automaticImport = true;
 
     /** @var bool mainly for debugging - if true, client does raise exceptions if tried to send discards anyway */
     private $disableDiscards = false;
@@ -138,6 +140,14 @@ class ProductData extends Service {
         $this->importType = $type;
     }
 
+    /**
+     * Set the behavior of automatically scheduling an import & export when a batch is completed. Default is true.
+     * @see https://api-docs.productsup.io/#committing
+     * @param bool $mode If false, neither import nor export will start automatic, but you have to trigger a process.
+     */
+    public function setAutomaticImportScheduling(bool $mode) {
+        $this->automaticImport = $mode;
+    }
 
     /**
      * send products to the api that were not sent yet,
@@ -155,7 +165,8 @@ class ProductData extends Service {
         $request = $this->getRequest();
         $request->method = Request::METHOD_POST;
         $request->postBody = array(
-            'type' => $this->importType
+            'type' => $this->importType,
+            'automatic_import' => $this->automaticImport
         );
         $request->url .= '/commit';
         $response = $this->getIoHandler()->executeRequest($request);

@@ -96,6 +96,13 @@ $ProductService->delete(array(
     )
 );
 
+/**
+ * Optional: Deactivate the automatic import and export process (thats enabled by default) so that you are responsible
+ * for triggering a process after the commit (and for determining the type more precisely).
+ * @see examples\service\Process.php
+ * @see https://api-docs.productsup.io/#committing
+ */
+//$ProductService->setAutomaticImportScheduling(false);
 
 /**
  * if you added all products, call commit to start the processing:
