@@ -91,6 +91,19 @@ class ProductData extends Service {
         }
     }
 
+    /**
+     * Returns the current batch id.
+     *
+     * note:
+     * If none has been set, a new one will be created. This prevents logical issues if getBatchId() is called
+     * before commit().
+     * @return string current batch id
+     */
+    public function getBatchId() {
+        $this->createBatchId();
+        return $this->_batchId;
+    }
+
     public function disableDiscards() {
         $this->disableDiscards = true;
     }

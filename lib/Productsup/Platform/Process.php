@@ -8,6 +8,7 @@ use Productsup\Platform\Site\Reference;
 class Process extends DataModel {
     public $action;
     public $action_id;
+    public $batch_id;
     public $site_id;
 
     /**
@@ -35,6 +36,10 @@ class Process extends DataModel {
             'id' => $this->action_id,
             'action' => $this->action,
         );
+
+        if (!is_null($this->batch_id)) {
+            $data['batch_id'] = $this->batch_id;
+        }
 
         if ($full) {
             $data['site_id'] = $this->site_id;
