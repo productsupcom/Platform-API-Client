@@ -1,3 +1,8 @@
+# Deprecated
+
+- **Attenion**: this PHP client is running outdated version of PHP and is not actively maintained by Productsup. Please use at your own risk.
+- We will not merge any contributions, as this repository will be replaced by an Open API Specification file in the near future
+
 # Installation (Composer)
 
 Add this to your require section
